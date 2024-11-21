@@ -90,11 +90,11 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example.verygoodcore.flutter-todos" "\0"
-            VALUE "FileDescription", "flutter_todos" "\0"
+            VALUE "FileDescription", "todo_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flutter_todos" "\0"
+            VALUE "InternalName", "todo_app" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example.verygoodcore.flutter-todos. All rights reserved." "\0"
-            VALUE "OriginalFilename", "flutter_todos.exe" "\0"
+            VALUE "OriginalFilename", "todo_app.exe" "\0"
             VALUE "ProductName", "Flutter Todos" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

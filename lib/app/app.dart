@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_todos/home/home.dart';
-import 'package:flutter_todos/l10n/l10n.dart';
-import 'package:flutter_todos/theme/theme.dart';
+import 'package:todo_app/home/home.dart';
+import 'package:todo_app/l10n/l10n.dart';
+import 'package:todo_app/theme/theme.dart';
 import 'package:todos_repository/todos_repository.dart';
 
 class App extends StatelessWidget {

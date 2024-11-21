@@ -4,7 +4,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_todos/todos_overview/todos_overview.dart' hide TodosViewFilter;
+import 'package:todo_app/todos_overview/todos_overview.dart' hide TodosViewFilter;
 import 'package:mocktail/mocktail.dart';
 import 'package:todos_repository/todos_repository.dart';
 

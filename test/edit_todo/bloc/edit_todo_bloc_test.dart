@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_todos/edit_todo/edit_todo.dart';
+import 'package:todo_app/edit_todo/edit_todo.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:todos_repository/todos_repository.dart';
 

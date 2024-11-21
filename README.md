@@ -5,8 +5,7 @@
 
 <div align="center">
 
-
-![Flutter Badge](https://img.shields.io/badge/Flutter-blue?logo=flutter&amp;logoColor=white&style=flat)
+![Flutter Badge](https://img.shields.io/badge/Flutter-blue?logo=flutter&logoColor=white&=flat)
 ![GitHub stars](https://img.shields.io/github/stars/paugarcia32/ToDo-List-App)
 ![GitHub issues](https://img.shields.io/github/issues/paugarcia32/ToDo-List-App)
 ![GitHub forks](https://img.shields.io/github/forks/paugarcia32/ToDo-List-App)
@@ -14,9 +13,6 @@
 ![SQLite Badge](https://img.shields.io/badge/SQLite-%2307405e.svg?logo=sqlite&logoColor=white&style=flat)
 
 </div>
-
-
-
 
 # ToDo List App
 
@@ -30,11 +26,10 @@ An example todos app that showcases bloc state management patterns.
 - [**Shared Preferences**](https://pub.dev/packages/shared_preferences) - persistent storage for simple data
 - [**BLoC**](https://bloclibrary.dev/) - Predictable state management library for Dart.
 
-
 ## ⤵️ Instalation
 
 1. Download project
-   
+
 ```bash
 git clone https://github.com/paugarcia32/ToDo-List-App.git
 ```
@@ -48,13 +43,10 @@ dart pub global activate very_good_cli
 ```bash
 very_good packages get --recursive
 ```
-   
+
 ```bash
 flutter pub get
 ```
-
-
-
 
 ## 🚀 How to run and build
 
@@ -138,7 +130,7 @@ This project relies on [flutter_localizations][flutter_localizations_link] and f
 3. Use the new string
 
 ```dart
-import 'package:flutter_todos/l10n/l10n.dart';
+import 'package:todo_app/l10n/l10n.dart';
 
 @override
 Widget build(BuildContext context) {
@@ -212,12 +204,7 @@ flutter gen-l10n --arb-dir="lib/l10n/arb"
 
 Alternatively, run `flutter run` and code generation will take place automatically.
 
-
-
-
 ## 🔗 Links
+
 [![blog](https://img.shields.io/badge/my_website-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://www.paugarcia.dev/)
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/paugarcia32/)
-
-
-

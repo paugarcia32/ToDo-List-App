@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, avoid_redundant_argument_values
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_todos/stats/stats.dart';
+import 'package:todo_app/stats/stats.dart';
 
 void main() {
   group('StatsState', () {

@@ -1,4 +1,4 @@
-name: flutter_todos
+name: todo_app
 description: An example todos app that showcases bloc state management patterns.
 version: 1.0.0+1
 publish_to: none
