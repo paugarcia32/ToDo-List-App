@@ -4,6 +4,7 @@ import 'package:todo_app/edit_todo/edit_todo.dart';
 import 'package:todo_app/home/home.dart';
 import 'package:todo_app/stats/stats.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
+import 'package:todos_repository/todos_repository.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -25,9 +26,7 @@ class HomeView extends StatelessWidget {
     final selectedTab = context.select((HomeCubit cubit) => cubit.state.tab);
 
     return Scaffold(
-        body:
-            // NavigationBar(destinations: const [TodosOverviewPage(), StatsPage()]),
-            IndexedStack(
+        body: IndexedStack(
           index: selectedTab.index,
           children: const [TodosOverviewPage(), StatsPage()],
         ),
@@ -35,7 +34,22 @@ class HomeView extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           shape: const CircleBorder(),
           key: const Key('homeView_addTodo_floatingActionButton'),
-          onPressed: () => Navigator.of(context).push(EditTodoPage.route()),
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            builder: (context) {
+              return BlocProvider(
+                create: (context) => EditTodoBloc(
+                  todosRepository: context.read<TodosRepository>(),
+                  initialTodo: null,
+                ),
+                child: const EditTodoBottomSheet(),
+              );
+            },
+          ),
           child: const Icon(Icons.add),
         ),
         bottomNavigationBar: NavigationBar(
