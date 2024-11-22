@@ -17,7 +17,7 @@ class EditTodoPage extends StatelessWidget {
           todosRepository: context.read<TodosRepository>(),
           initialTodo: initialTodo,
         ),
-        child: const EditTodoPage(),
+        child: const EditTodoView(),
       ),
     );
   }
@@ -32,6 +32,45 @@ class EditTodoPage extends StatelessWidget {
   }
 }
 
+// class EditTodoView extends StatelessWidget {
+//   const EditTodoView({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final l10n = context.l10n;
+//     final status = context.select((EditTodoBloc bloc) => bloc.state.status);
+//     final isNewTodo = context.select(
+//       (EditTodoBloc bloc) => bloc.state.isNewTodo,
+//     );
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(
+//           isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
+//         ),
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         tooltip: l10n.editTodoSaveButtonTooltip,
+//         shape: const ContinuousRectangleBorder(
+//           borderRadius: BorderRadius.all(Radius.circular(32)),
+//         ),
+//         onPressed: status.isLoadingOrSuccess ? null : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
+//         child: status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : const Icon(Icons.check_rounded),
+//       ),
+//       body: const CupertinoScrollbar(
+//         child: SingleChildScrollView(
+//           child: Padding(
+//             padding: EdgeInsets.all(16),
+//             child: Column(
+//               children: [_TitleField(), _DescriptionField()],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 class EditTodoView extends StatelessWidget {
   const EditTodoView({super.key});
 
@@ -43,29 +82,31 @@ class EditTodoView extends StatelessWidget {
       (EditTodoBloc bloc) => bloc.state.isNewTodo,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
-        ),
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 16,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: l10n.editTodoSaveButtonTooltip,
-        shape: const ContinuousRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(32)),
-        ),
-        onPressed: status.isLoadingOrSuccess ? null : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
-        child: status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : const Icon(Icons.check_rounded),
-      ),
-      body: const CupertinoScrollbar(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [_TitleField(), _DescriptionField()],
-            ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
           ),
-        ),
+          const SizedBox(height: 16),
+          const _TitleField(),
+          const SizedBox(height: 16),
+          const _DescriptionField(),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed:
+                status.isLoadingOrSuccess ? null : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
+            child:
+                status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : Text(l10n.editTodoSaveButtonTooltip),
+          ),
+        ],
       ),
     );
   }
@@ -126,47 +167,6 @@ class _DescriptionField extends StatelessWidget {
       onChanged: (value) {
         context.read<EditTodoBloc>().add(EditTodoDescriptionChanged(value));
       },
-    );
-  }
-}
-
-class EditTodoBottomSheet extends StatelessWidget {
-  const EditTodoBottomSheet({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final status = context.select((EditTodoBloc bloc) => bloc.state.status);
-    final isNewTodo = context.select(
-      (EditTodoBloc bloc) => bloc.state.isNewTodo,
-    );
-
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
-          ),
-          const SizedBox(height: 16),
-          const _TitleField(),
-          const SizedBox(height: 16),
-          const _DescriptionField(),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed:
-                status.isLoadingOrSuccess ? null : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
-            child:
-                status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : Text(l10n.editTodoSaveButtonTooltip),
-          ),
-        ],
-      ),
     );
   }
 }

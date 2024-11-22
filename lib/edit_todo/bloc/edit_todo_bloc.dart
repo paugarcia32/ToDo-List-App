@@ -38,6 +38,24 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     emit(state.copyWith(description: event.description));
   }
 
+  // Future<void> _onSubmitted(
+  //   EditTodoSubmitted event,
+  //   Emitter<EditTodoState> emit,
+  // ) async {
+  //   emit(state.copyWith(status: EditTodoStatus.loading));
+  //   final todo = (state.initialTodo ?? Todo(title: '')).copyWith(
+  //     title: state.title,
+  //     description: state.description,
+  //   );
+
+  //   try {
+  //     await _todosRepository.saveTodo(todo);
+  //     emit(state.copyWith(status: EditTodoStatus.success));
+  //   } catch (e) {
+  //     emit(state.copyWith(status: EditTodoStatus.failure));
+  //   }
+  // }
+
   Future<void> _onSubmitted(
     EditTodoSubmitted event,
     Emitter<EditTodoState> emit,
@@ -51,8 +69,14 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     try {
       await _todosRepository.saveTodo(todo);
       emit(state.copyWith(status: EditTodoStatus.success));
+      // Resetear el estado después de un pequeño delay para que se vea el cambio de estado
+      await Future.delayed(const Duration(milliseconds: 500));
+      emit(state.copyWith(status: EditTodoStatus.initial));
     } catch (e) {
       emit(state.copyWith(status: EditTodoStatus.failure));
+      // También resetear el estado después de un fallo
+      await Future.delayed(const Duration(milliseconds: 500));
+      emit(state.copyWith(status: EditTodoStatus.initial));
     }
   }
 }

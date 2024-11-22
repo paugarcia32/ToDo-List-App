@@ -46,7 +46,7 @@ class HomeView extends StatelessWidget {
                   todosRepository: context.read<TodosRepository>(),
                   initialTodo: null,
                 ),
-                child: const EditTodoBottomSheet(),
+                child: const EditTodoView(),
               );
             },
           ),

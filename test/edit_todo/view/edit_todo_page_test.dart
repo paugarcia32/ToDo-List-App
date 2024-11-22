@@ -105,7 +105,7 @@ void main() {
         navigator: navigator,
         child: BlocProvider.value(
           value: editTodoBloc,
-          child: const EditTodoView(),
+          child: EditTodoView(),
         ),
       );
     }
