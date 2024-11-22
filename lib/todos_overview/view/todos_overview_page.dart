@@ -31,6 +31,8 @@ class TodosOverviewView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.todosOverviewAppBarTitle),
+        titleTextStyle: TextStyle(fontSize: 20),
+        toolbarHeight: 45,
         actions: const [
           TodosOverviewFilterButton(),
           TodosOverviewOptionsButton(),

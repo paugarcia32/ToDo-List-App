@@ -159,8 +159,8 @@ class _DescriptionField extends StatelessWidget {
         labelText: l10n.editTodoDescriptionLabel,
         hintText: hintText,
       ),
-      maxLength: 300,
-      maxLines: 7,
+      // maxLength: 300,
+      // maxLines: 7,
       inputFormatters: [
         LengthLimitingTextInputFormatter(300),
       ],

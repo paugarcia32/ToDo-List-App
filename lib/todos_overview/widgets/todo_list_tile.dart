@@ -52,8 +52,8 @@ class TodoListTile extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         leading: Checkbox(
-          shape: const ContinuousRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           value: todo.isCompleted,
           onChanged: onToggleCompleted == null ? null : (value) => onToggleCompleted!(value!),
