@@ -223,6 +223,7 @@ class _TagsFieldState extends State<_TagsField> {
         ),
         const SizedBox(height: 8),
         Autocomplete<String>(
+          optionsViewOpenDirection: OptionsViewOpenDirection.up,
           optionsBuilder: (TextEditingValue textEditingValue) {
             if (textEditingValue.text.isEmpty) {
               return const Iterable<String>.empty();
