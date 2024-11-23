@@ -24,12 +24,8 @@ part 'todo.g.dart';
 @JsonSerializable()
 class Todo extends Equatable {
   /// {@macro todo_item}
-  Todo({
-    required this.title,
-    String? id,
-    this.description = '',
-    this.isCompleted = false,
-  })  : assert(
+  Todo({required this.title, String? id, this.description = '', this.isCompleted = false, this.tags = const []})
+      : assert(
           id == null || id.isNotEmpty,
           'id must either be null or not empty',
         ),
@@ -50,6 +46,8 @@ class Todo extends Equatable {
   /// Defaults to an empty string.
   final String description;
 
+  final List<String>? tags;
+
   /// Whether the `todo` is completed.
   ///
   /// Defaults to `false`.
@@ -63,12 +61,14 @@ class Todo extends Equatable {
     String? title,
     String? description,
     bool? isCompleted,
+    List<String>? tags,
   }) {
     return Todo(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       isCompleted: isCompleted ?? this.isCompleted,
+      tags: tags ?? this.tags,
     );
   }
 
@@ -79,5 +79,5 @@ class Todo extends Equatable {
   JsonMap toJson() => _$TodoToJson(this);
 
   @override
-  List<Object> get props => [id, title, description, isCompleted];
+  List<Object?> get props => [id, title, description, isCompleted, tags];
 }

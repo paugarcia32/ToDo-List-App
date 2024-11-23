@@ -15,29 +15,28 @@ final class EditTodoState extends Equatable {
     this.initialTodo,
     this.title = '',
     this.description = '',
+    this.tags,
   });
 
   final EditTodoStatus status;
   final Todo? initialTodo;
   final String title;
   final String description;
+  final List<String>? tags;
 
   bool get isNewTodo => initialTodo == null;
 
-  EditTodoState copyWith({
-    EditTodoStatus? status,
-    Todo? initialTodo,
-    String? title,
-    String? description,
-  }) {
+  EditTodoState copyWith(
+      {EditTodoStatus? status, Todo? initialTodo, String? title, String? description, List<String>? tags}) {
     return EditTodoState(
       status: status ?? this.status,
       initialTodo: initialTodo ?? this.initialTodo,
       title: title ?? this.title,
       description: description ?? this.description,
+      tags: tags ?? this.tags,
     );
   }
 
   @override
-  List<Object?> get props => [status, initialTodo, title, description];
+  List<Object?> get props => [status, initialTodo, title, description, tags];
 }

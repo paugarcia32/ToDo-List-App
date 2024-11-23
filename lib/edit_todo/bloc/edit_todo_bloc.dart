@@ -12,13 +12,14 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
   })  : _todosRepository = todosRepository,
         super(
           EditTodoState(
-            initialTodo: initialTodo,
-            title: initialTodo?.title ?? '',
-            description: initialTodo?.description ?? '',
-          ),
+              initialTodo: initialTodo,
+              title: initialTodo?.title ?? '',
+              description: initialTodo?.description ?? '',
+              tags: initialTodo?.tags ?? []),
         ) {
     on<EditTodoTitleChanged>(_onTitleChanged);
     on<EditTodoDescriptionChanged>(_onDescriptionChanged);
+    on<EditTodoTagsChanged>(_onTagsChanged);
     on<EditTodoSubmitted>(_onSubmitted);
   }
 
@@ -38,33 +39,17 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     emit(state.copyWith(description: event.description));
   }
 
-  // Future<void> _onSubmitted(
-  //   EditTodoSubmitted event,
-  //   Emitter<EditTodoState> emit,
-  // ) async {
-  //   emit(state.copyWith(status: EditTodoStatus.loading));
-  //   final todo = (state.initialTodo ?? Todo(title: '')).copyWith(
-  //     title: state.title,
-  //     description: state.description,
-  //   );
-
-  //   try {
-  //     await _todosRepository.saveTodo(todo);
-  //     emit(state.copyWith(status: EditTodoStatus.success));
-  //   } catch (e) {
-  //     emit(state.copyWith(status: EditTodoStatus.failure));
-  //   }
-  // }
+  void _onTagsChanged(EditTodoTagsChanged event, Emitter<EditTodoState> emit) {
+    emit(state.copyWith(tags: event.tags));
+  }
 
   Future<void> _onSubmitted(
     EditTodoSubmitted event,
     Emitter<EditTodoState> emit,
   ) async {
     emit(state.copyWith(status: EditTodoStatus.loading));
-    final todo = (state.initialTodo ?? Todo(title: '')).copyWith(
-      title: state.title,
-      description: state.description,
-    );
+    final todo = (state.initialTodo ?? Todo(title: ''))
+        .copyWith(title: state.title, description: state.description, tags: state.tags);
 
     try {
       await _todosRepository.saveTodo(todo);

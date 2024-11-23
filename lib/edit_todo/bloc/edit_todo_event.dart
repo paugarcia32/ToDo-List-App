@@ -25,6 +25,15 @@ final class EditTodoDescriptionChanged extends EditTodoEvent {
   List<Object> get props => [description];
 }
 
+final class EditTodoTagsChanged extends EditTodoEvent {
+  const EditTodoTagsChanged(this.tags);
+
+  final List<String>? tags;
+
+  @override
+  List<Object> get props => [tags ?? []];
+}
+
 final class EditTodoSubmitted extends EditTodoEvent {
   const EditTodoSubmitted();
 }

@@ -32,45 +32,6 @@ class EditTodoPage extends StatelessWidget {
   }
 }
 
-// class EditTodoView extends StatelessWidget {
-//   const EditTodoView({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final l10n = context.l10n;
-//     final status = context.select((EditTodoBloc bloc) => bloc.state.status);
-//     final isNewTodo = context.select(
-//       (EditTodoBloc bloc) => bloc.state.isNewTodo,
-//     );
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(
-//           isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
-//         ),
-//       ),
-//       floatingActionButton: FloatingActionButton(
-//         tooltip: l10n.editTodoSaveButtonTooltip,
-//         shape: const ContinuousRectangleBorder(
-//           borderRadius: BorderRadius.all(Radius.circular(32)),
-//         ),
-//         onPressed: status.isLoadingOrSuccess ? null : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
-//         child: status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : const Icon(Icons.check_rounded),
-//       ),
-//       body: const CupertinoScrollbar(
-//         child: SingleChildScrollView(
-//           child: Padding(
-//             padding: EdgeInsets.all(16),
-//             child: Column(
-//               children: [_TitleField(), _DescriptionField()],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class EditTodoView extends StatelessWidget {
   const EditTodoView({super.key});
 
@@ -89,24 +50,29 @@ class EditTodoView extends StatelessWidget {
         top: 16,
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
-          ),
-          const SizedBox(height: 16),
-          const _TitleField(),
-          const SizedBox(height: 16),
-          const _DescriptionField(),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed:
-                status.isLoadingOrSuccess ? null : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
-            child:
-                status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : Text(l10n.editTodoSaveButtonTooltip),
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
+              // style: Theme.of(context).textTheme.headline6,
+            ),
+            const SizedBox(height: 16),
+            const _TitleField(),
+            const SizedBox(height: 16),
+            const _DescriptionField(),
+            const SizedBox(height: 16),
+            const _TagsField(),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed:
+                  status.isLoadingOrSuccess ? null : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
+              child:
+                  status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : Text(l10n.editTodoSaveButtonTooltip),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -159,14 +125,94 @@ class _DescriptionField extends StatelessWidget {
         labelText: l10n.editTodoDescriptionLabel,
         hintText: hintText,
       ),
-      // maxLength: 300,
-      // maxLines: 7,
       inputFormatters: [
         LengthLimitingTextInputFormatter(300),
       ],
       onChanged: (value) {
         context.read<EditTodoBloc>().add(EditTodoDescriptionChanged(value));
       },
+    );
+  }
+}
+
+class _TagsField extends StatefulWidget {
+  const _TagsField();
+
+  @override
+  _TagsFieldState createState() => _TagsFieldState();
+}
+
+class _TagsFieldState extends State<_TagsField> {
+  final TextEditingController _controller = TextEditingController();
+
+  void _addTag(String tag) {
+    if (tag.trim().isEmpty) return;
+
+    final bloc = context.read<EditTodoBloc>();
+    final tags = List<String>.from(bloc.state.tags ?? []);
+    final newTag = tag.trim();
+
+    if (!tags.contains(newTag)) {
+      tags.add(newTag);
+      bloc.add(EditTodoTagsChanged(tags));
+    }
+
+    _controller.clear();
+  }
+
+  void _removeTag(String tag) {
+    final bloc = context.read<EditTodoBloc>();
+    final tags = List<String>.from(bloc.state.tags ?? []);
+
+    tags.remove(tag);
+    bloc.add(EditTodoTagsChanged(tags));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<EditTodoBloc>().state;
+    final tags = state.tags ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Tags',
+          // style: Theme.of(context).textTheme.subtitle1,
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: tags
+              .map(
+                (tag) => InputChip(
+                  label: Text(tag),
+                  onDeleted: () => _removeTag(tag),
+                ),
+              )
+              .toList(),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _controller,
+          decoration: InputDecoration(
+            labelText: 'Add tag',
+            hintText: 'Enter a tag',
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => _addTag(_controller.text),
+            ),
+          ),
+          onSubmitted: _addTag,
+        ),
+      ],
     );
   }
 }
