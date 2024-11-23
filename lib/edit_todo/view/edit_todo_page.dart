@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -143,6 +145,27 @@ class _TagsField extends StatefulWidget {
 
 class _TagsFieldState extends State<_TagsField> {
   final TextEditingController _controller = TextEditingController();
+  List<String> _allTags = [];
+  StreamSubscription<List<Todo>>? _todosSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAllTags();
+  }
+
+  void _loadAllTags() {
+    final todosRepository = context.read<TodosRepository>();
+    _todosSubscription = todosRepository.getTodos().listen((todos) {
+      final Set<String> tagsSet = {};
+      for (var todo in todos) {
+        tagsSet.addAll(todo.tags ?? []);
+      }
+      setState(() {
+        _allTags = tagsSet.toList();
+      });
+    });
+  }
 
   void _addTag(String tag) {
     if (tag.trim().isEmpty) return;
@@ -169,6 +192,7 @@ class _TagsFieldState extends State<_TagsField> {
 
   @override
   void dispose() {
+    _todosSubscription?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -198,17 +222,36 @@ class _TagsFieldState extends State<_TagsField> {
               .toList(),
         ),
         const SizedBox(height: 8),
-        TextField(
-          controller: _controller,
-          decoration: InputDecoration(
-            labelText: 'Add tag',
-            hintText: 'Enter a tag',
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => _addTag(_controller.text),
-            ),
-          ),
-          onSubmitted: _addTag,
+        Autocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            if (textEditingValue.text.isEmpty) {
+              return const Iterable<String>.empty();
+            }
+            return _allTags.where((String option) {
+              return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+            });
+          },
+          onSelected: (String selection) {
+            _addTag(selection);
+          },
+          fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController,
+              FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            return TextField(
+              controller: fieldTextEditingController,
+              focusNode: fieldFocusNode,
+              decoration: InputDecoration(
+                labelText: 'Add tag',
+                hintText: 'Enter a tag',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => _addTag(fieldTextEditingController.text),
+                ),
+              ),
+              onSubmitted: (String value) {
+                _addTag(value);
+              },
+            );
+          },
         ),
       ],
     );
