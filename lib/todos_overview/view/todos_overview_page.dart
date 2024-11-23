@@ -123,21 +123,25 @@ class TodosOverviewView extends StatelessWidget {
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                         ),
-                        builder: (context) {
+                        builder: (bottomSheetContext) {
                           return BlocProvider(
                             create: (context) => EditTodoBloc(
                               todosRepository: context.read<TodosRepository>(),
                               initialTodo: todo,
                             ),
-                            child: const EditTodoView(),
+                            child: BlocListener<EditTodoBloc, EditTodoState>(
+                              listenWhen: (previous, current) =>
+                                  previous.status != current.status && current.status == EditTodoStatus.success,
+                              listener: (context, state) {
+                                Navigator.of(bottomSheetContext).pop();
+                              },
+                              child: const EditTodoView(),
+                            ),
                           );
                         },
                       );
-                      // Navigator.of(context).push(
-                      //   EditTodoPage.route(initialTodo: todo),
-                      // );
                     },
-                    tags: [],
+                    tags: todo.tags ?? [],
                   );
                 },
               ),
