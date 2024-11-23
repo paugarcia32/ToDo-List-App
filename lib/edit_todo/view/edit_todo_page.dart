@@ -56,7 +56,6 @@ class EditTodoView extends StatelessWidget {
           children: [
             Text(
               isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
-              // style: Theme.of(context).textTheme.headline6,
             ),
             const SizedBox(height: 16),
             const _TitleField(),
@@ -149,7 +148,7 @@ class _TagsFieldState extends State<_TagsField> {
     if (tag.trim().isEmpty) return;
 
     final bloc = context.read<EditTodoBloc>();
-    final tags = List<String>.from(bloc.state.tags ?? []);
+    final tags = List<String>.from(bloc.state.tags);
     final newTag = tag.trim();
 
     if (!tags.contains(newTag)) {
@@ -162,7 +161,7 @@ class _TagsFieldState extends State<_TagsField> {
 
   void _removeTag(String tag) {
     final bloc = context.read<EditTodoBloc>();
-    final tags = List<String>.from(bloc.state.tags ?? []);
+    final tags = List<String>.from(bloc.state.tags);
 
     tags.remove(tag);
     bloc.add(EditTodoTagsChanged(tags));
@@ -177,14 +176,13 @@ class _TagsFieldState extends State<_TagsField> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditTodoBloc>().state;
-    final tags = state.tags ?? [];
+    final tags = state.tags;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Tags',
-          // style: Theme.of(context).textTheme.subtitle1,
         ),
         const SizedBox(height: 8),
         Wrap(

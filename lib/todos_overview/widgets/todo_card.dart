@@ -4,14 +4,14 @@ import 'package:todos_repository/todos_repository.dart';
 class TodoCard extends StatelessWidget {
   const TodoCard({
     required this.todo,
-    required this.tags,
+    // required this.tags,
     this.onToggleCompleted,
     this.onTap,
     super.key,
   });
 
   final Todo todo;
-  final List<String> tags;
+  // final List<String> tags;
   final ValueChanged<bool>? onToggleCompleted;
   final VoidCallback? onTap;
 
@@ -64,12 +64,12 @@ class TodoCard extends StatelessWidget {
                     style: theme.textTheme.bodyMedium,
                   ),
                 ),
-              if (tags.isNotEmpty)
+              if (todo.tags!.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Wrap(
                     spacing: 8,
-                    children: tags
+                    children: todo.tags!
                         .map((tag) => Chip(
                               label: Text(tag),
                             ))

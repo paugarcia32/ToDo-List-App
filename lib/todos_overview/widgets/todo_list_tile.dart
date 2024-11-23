@@ -5,7 +5,6 @@ import 'package:todos_repository/todos_repository.dart';
 class TodoListTile extends StatelessWidget {
   const TodoListTile({
     required this.todo,
-    required this.tags,
     super.key,
     this.onToggleCompleted,
     this.onDismissed,
@@ -13,7 +12,6 @@ class TodoListTile extends StatelessWidget {
   });
 
   final Todo todo;
-  final List<String> tags;
   final ValueChanged<bool>? onToggleCompleted;
   final DismissDirectionCallback? onDismissed;
   final VoidCallback? onTap;
@@ -27,7 +25,7 @@ class TodoListTile extends StatelessWidget {
       background: _buildDismissBackground(context),
       child: TodoCard(
         todo: todo,
-        tags: tags,
+        // tags: tags,
         onToggleCompleted: onToggleCompleted,
         onTap: onTap,
       ),
