@@ -51,6 +51,15 @@ class StatsView extends StatelessWidget {
               style: textTheme.headlineSmall,
             ),
           ),
+          ListTile(
+            key: const Key('statsView_totalTags_listTile'),
+            leading: const Icon(Icons.tag),
+            title: Text("Tags"),
+            trailing: Text(
+              '${state.totalTags}',
+              style: textTheme.headlineSmall,
+            ),
+          )
         ],
       ),
     );

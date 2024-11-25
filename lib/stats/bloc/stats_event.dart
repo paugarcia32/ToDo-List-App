@@ -10,3 +10,7 @@ sealed class StatsEvent extends Equatable {
 final class StatsSubscriptionRequested extends StatsEvent {
   const StatsSubscriptionRequested();
 }
+
+final class StatsTotalTags extends StatsEvent {
+  const StatsTotalTags();
+}
