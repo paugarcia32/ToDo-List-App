@@ -105,6 +105,7 @@ class TodosOverviewView extends StatelessWidget {
                   final todo = state.filteredTodos.elementAt(index);
                   return TodoListTile(
                     todo: todo,
+                    isLast: index == state.filteredTodos.length - 1,
                     onToggleCompleted: (isCompleted) {
                       context.read<TodosOverviewBloc>().add(
                             TodosOverviewTodoCompletionToggled(

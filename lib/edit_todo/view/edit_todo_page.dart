@@ -56,8 +56,9 @@ class EditTodoView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
+            Divider(
+              endIndent: 150,
+              indent: 150,
             ),
             const SizedBox(height: 16),
             const _TitleField(),
@@ -67,10 +68,17 @@ class EditTodoView extends StatelessWidget {
             const _TagsField(),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed:
-                  status.isLoadingOrSuccess ? null : () => context.read<EditTodoBloc>().add(const EditTodoSubmitted()),
-              child:
-                  status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : Text(l10n.editTodoSaveButtonTooltip),
+              onPressed: status.isLoadingOrSuccess
+                  ? null
+                  : () {
+                      context.read<EditTodoBloc>().add(const EditTodoSubmitted());
+                    },
+              child: status.isLoadingOrSuccess
+                  ? const CupertinoActivityIndicator()
+                  : Text(
+                      // isNewTodo ? l10n.addTodoButtonTooltip : l10n.editTodoSaveButtonTooltip,
+                      isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
+                    ),
             ),
           ],
         ),

@@ -9,9 +9,11 @@ class TodoListTile extends StatelessWidget {
     this.onToggleCompleted,
     this.onDismissed,
     this.onTap,
+    required this.isLast,
   });
 
   final Todo todo;
+  final bool isLast;
   final ValueChanged<bool>? onToggleCompleted;
   final DismissDirectionCallback? onDismissed;
   final VoidCallback? onTap;
@@ -25,6 +27,7 @@ class TodoListTile extends StatelessWidget {
       background: _buildDismissBackground(context),
       child: TodoCard(
         todo: todo,
+        isLast: isLast,
         onToggleCompleted: onToggleCompleted,
         onTap: onTap,
       ),

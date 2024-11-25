@@ -97,6 +97,10 @@
   "@editTodoSaveButtonTooltip": {
     "description": "Tooltip text shown in the save button on the Todo Edit Page"
   },
+  "addTodoButtonTooltip": "Save changes",
+  "@addTodoButtonTooltip": {
+    "description": "Tooltip text shown in the add button on the Todo Edit Page"
+  },
   "statsAppBarTitle": "Stats",
   "@statsAppBarTitle": {
     "description": "Title text shown in the AppBar of the Stats Page"
