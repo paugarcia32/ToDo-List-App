@@ -4,14 +4,12 @@ import 'package:todos_repository/todos_repository.dart';
 class TodoCard extends StatelessWidget {
   const TodoCard({
     required this.todo,
-    // required this.tags,
     this.onToggleCompleted,
     this.onTap,
     super.key,
   });
 
   final Todo todo;
-  // final List<String> tags;
   final ValueChanged<bool>? onToggleCompleted;
   final VoidCallback? onTap;
 
@@ -25,11 +23,12 @@ class TodoCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
+          padding: const EdgeInsets.all(8),
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Checkbox(
                     shape: const RoundedRectangleBorder(
@@ -38,44 +37,58 @@ class TodoCard extends StatelessWidget {
                     value: todo.isCompleted,
                     onChanged: onToggleCompleted == null ? null : (value) => onToggleCompleted!(value!),
                   ),
-                  Expanded(
-                    child: Text(
-                      todo.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: !todo.isCompleted
-                          ? theme.textTheme.titleMedium
-                          : theme.textTheme.titleMedium?.copyWith(
-                              color: captionColor,
-                              decoration: TextDecoration.lineThrough,
-                            ),
-                    ),
-                  ),
-                  if (onTap != null) const Icon(Icons.chevron_right),
                 ],
               ),
-              if (todo.description.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    todo.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium,
-                  ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            todo.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: !todo.isCompleted
+                                ? theme.textTheme.titleMedium
+                                : theme.textTheme.titleMedium?.copyWith(
+                                    color: captionColor,
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                          ),
+                        ),
+                        if (onTap != null) const Icon(Icons.chevron_right),
+                      ],
+                    ),
+                    if (todo.description.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          todo.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ),
+                    if (todo.tags!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Wrap(
+                          spacing: 8,
+                          children: todo.tags!
+                              .map((tag) => InputChip(
+                                    avatar: Icon(Icons.tag),
+                                    label: Text(tag),
+                                    labelStyle: TextStyle(color: captionColor),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                  ],
                 ),
-              if (todo.tags!.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Wrap(
-                    spacing: 8,
-                    children: todo.tags!
-                        .map((tag) => Chip(
-                              label: Text(tag),
-                            ))
-                        .toList(),
-                  ),
-                ),
+              ),
             ],
           ),
         ),

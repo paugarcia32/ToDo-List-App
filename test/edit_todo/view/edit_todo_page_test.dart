@@ -11,6 +11,8 @@ import '../../helpers/helpers.dart';
 class MockEditTodoBloc extends MockBloc<EditTodoEvent, EditTodoState> implements EditTodoBloc {}
 
 void main() {
+  late TodosRepository todosRepository;
+
   final mockTodo = Todo(
     id: '1',
     title: 'title 1',
@@ -22,9 +24,12 @@ void main() {
   late EditTodoBloc editTodoBloc;
 
   setUp(() {
+    todosRepository = MockTodosRepository();
     navigator = MockNavigator();
     when(() => navigator.canPop()).thenReturn(false);
     when(() => navigator.push<void>(any())).thenAnswer((_) async {});
+
+    when(() => todosRepository.getTodos()).thenAnswer((_) => Stream.value([]));
 
     editTodoBloc = MockEditTodoBloc();
     when(() => editTodoBloc.state).thenReturn(

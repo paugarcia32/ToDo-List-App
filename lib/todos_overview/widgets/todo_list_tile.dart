@@ -25,7 +25,6 @@ class TodoListTile extends StatelessWidget {
       background: _buildDismissBackground(context),
       child: TodoCard(
         todo: todo,
-        // tags: tags,
         onToggleCompleted: onToggleCompleted,
         onTap: onTap,
       ),
