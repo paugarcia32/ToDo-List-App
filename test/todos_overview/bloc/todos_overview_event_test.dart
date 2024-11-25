@@ -10,6 +10,7 @@ void main() {
       id: '1',
       title: 'title 1',
       description: 'description 1',
+      tags: ['work', 'urgent'],
     );
 
     group('TodosOverviewSubscriptionRequested', () {
@@ -51,8 +52,8 @@ void main() {
             isCompleted: true,
           ).props,
           equals(<Object?>[
-            mockTodo, // `todo`
-            true, // isCompleted
+            mockTodo,
+            true,
           ]),
         );
       });
@@ -70,7 +71,7 @@ void main() {
         expect(
           TodosOverviewTodoDeleted(mockTodo).props,
           equals(<Object?>[
-            mockTodo, // `todo`
+            mockTodo,
           ]),
         );
       });

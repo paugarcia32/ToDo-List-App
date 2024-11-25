@@ -127,7 +127,7 @@ class TodosOverviewView extends StatelessWidget {
                           return BlocProvider(
                             create: (context) => EditTodoBloc(
                               todosRepository: context.read<TodosRepository>(),
-                              initialTodo: todo, // Pass the todo with tags included
+                              initialTodo: todo,
                             ),
                             child: BlocListener<EditTodoBloc, EditTodoState>(
                               listenWhen: (previous, current) =>

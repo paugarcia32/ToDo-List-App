@@ -14,17 +14,20 @@ void main() {
       id: '1',
       title: 'title 1',
       description: 'description 1',
+      tags: ['work', 'urgent'],
     ),
     Todo(
       id: '2',
       title: 'title 2',
       description: 'description 2',
+      tags: ['personal', 'later'],
     ),
     Todo(
       id: '3',
       title: 'title 3',
       description: 'description 3',
       isCompleted: true,
+      tags: ['shopping', 'important', 'Prueba'],
     ),
   ];
 
@@ -37,10 +40,9 @@ void main() {
 
     setUp(() {
       todosRepository = MockTodosRepository();
-      when(
-        () => todosRepository.getTodos(),
-      ).thenAnswer((_) => Stream.value(mockTodos));
+      when(() => todosRepository.getTodos()).thenAnswer((_) => Stream.value(mockTodos));
       when(() => todosRepository.saveTodo(any())).thenAnswer((_) async {});
+      when(() => todosRepository.deleteTodo(any())).thenAnswer((_) async {});
     });
 
     TodosOverviewBloc buildBloc() {
@@ -88,9 +90,7 @@ void main() {
         'emits state with failure status '
         'when repository getTodos stream emits error',
         setUp: () {
-          when(
-            () => todosRepository.getTodos(),
-          ).thenAnswer((_) => Stream.error(Exception('oops')));
+          when(() => todosRepository.getTodos()).thenAnswer((_) => Stream.error(Exception('oops')));
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const TodosOverviewSubscriptionRequested()),
@@ -103,7 +103,7 @@ void main() {
 
     group('TodosOverviewTodoCompletionToggled', () {
       blocTest<TodosOverviewBloc, TodosOverviewState>(
-        'saves todo with isCompleted set to event isCompleted flag',
+        'saves todo with isCompleted set to event isCompleted flag and preserves tags',
         build: buildBloc,
         seed: () => TodosOverviewState(todos: mockTodos),
         act: (bloc) => bloc.add(
@@ -113,43 +113,42 @@ void main() {
           ),
         ),
         verify: (_) {
-          verify(
-            () => todosRepository.saveTodo(
-              mockTodos.first.copyWith(isCompleted: true),
-            ),
-          ).called(1);
+          final expectedTodo = mockTodos.first.copyWith(isCompleted: true);
+          verify(() => todosRepository.saveTodo(expectedTodo)).called(1);
+          expect(expectedTodo.tags, equals(mockTodos.first.tags));
         },
       );
     });
 
     group('TodosOverviewTodoDeleted', () {
       blocTest<TodosOverviewBloc, TodosOverviewState>(
-        'deletes todo using repository',
-        setUp: () {
-          when(
-            () => todosRepository.deleteTodo(any()),
-          ).thenAnswer((_) async {});
-        },
+        'deletes todo using repository and stores lastDeletedTodo with correct tags',
         build: buildBloc,
         seed: () => TodosOverviewState(todos: mockTodos),
         act: (bloc) => bloc.add(TodosOverviewTodoDeleted(mockTodos.first)),
-        verify: (_) {
-          verify(
-            () => todosRepository.deleteTodo(mockTodos.first.id),
-          ).called(1);
+        expect: () => [
+          TodosOverviewState(
+            todos: mockTodos,
+            lastDeletedTodo: mockTodos.first,
+          ),
+        ],
+        verify: (bloc) {
+          verify(() => todosRepository.deleteTodo(mockTodos.first.id)).called(1);
+          expect(bloc.state.lastDeletedTodo?.tags, equals(['work', 'urgent']));
         },
       );
     });
 
     group('TodosOverviewUndoDeletionRequested', () {
       blocTest<TodosOverviewBloc, TodosOverviewState>(
-        'restores last deleted undo and clears lastDeletedUndo field',
+        'restores last deleted todo with correct tags and clears lastDeletedTodo field',
         build: buildBloc,
         seed: () => TodosOverviewState(lastDeletedTodo: mockTodos.first),
         act: (bloc) => bloc.add(const TodosOverviewUndoDeletionRequested()),
         expect: () => const [TodosOverviewState()],
         verify: (_) {
           verify(() => todosRepository.saveTodo(mockTodos.first)).called(1);
+          expect(mockTodos.first.tags, equals(['work', 'urgent']));
         },
       );
     });
@@ -168,15 +167,16 @@ void main() {
     });
 
     group('TodosOverviewToggleAllRequested', () {
+      setUp(() {
+        when(
+          () => todosRepository.completeAll(
+            isCompleted: any(named: 'isCompleted'),
+          ),
+        ).thenAnswer((_) async => 0);
+      });
+
       blocTest<TodosOverviewBloc, TodosOverviewState>(
         'toggles all todos to completed when some or none are uncompleted',
-        setUp: () {
-          when(
-            () => todosRepository.completeAll(
-              isCompleted: any(named: 'isCompleted'),
-            ),
-          ).thenAnswer((_) async => 0);
-        },
         build: buildBloc,
         seed: () => TodosOverviewState(todos: mockTodos),
         act: (bloc) => bloc.add(const TodosOverviewToggleAllRequested()),
@@ -189,13 +189,6 @@ void main() {
 
       blocTest<TodosOverviewBloc, TodosOverviewState>(
         'toggles all todos to uncompleted when all are completed',
-        setUp: () {
-          when(
-            () => todosRepository.completeAll(
-              isCompleted: any(named: 'isCompleted'),
-            ),
-          ).thenAnswer((_) async => 0);
-        },
         build: buildBloc,
         seed: () => TodosOverviewState(
           todos: mockTodos.map((todo) => todo.copyWith(isCompleted: true)).toList(),
@@ -210,19 +203,53 @@ void main() {
     });
 
     group('TodosOverviewClearCompletedRequested', () {
+      setUp(() {
+        when(() => todosRepository.clearCompleted()).thenAnswer((_) async => 0);
+      });
+
       blocTest<TodosOverviewBloc, TodosOverviewState>(
         'clears completed todos using repository',
-        setUp: () {
-          when(
-            () => todosRepository.clearCompleted(),
-          ).thenAnswer((_) async => 0);
-        },
         build: buildBloc,
         act: (bloc) => bloc.add(const TodosOverviewClearCompletedRequested()),
         verify: (_) {
           verify(() => todosRepository.clearCompleted()).called(1);
         },
       );
+    });
+
+    group('TodosOverviewState', () {
+      test('filteredTodos returns all todos when no filter is applied', () {
+        final state = TodosOverviewState(todos: mockTodos);
+        expect(state.filteredTodos, equals(mockTodos));
+      });
+
+      test('filteredTodos filters by status and preserves tags', () {
+        final state = TodosOverviewState(
+          todos: mockTodos,
+          filter: TodosViewFilter.completedOnly,
+        );
+        final expectedTodos = mockTodos.where((todo) => todo.isCompleted).toList();
+        expect(state.filteredTodos, equals(expectedTodos));
+
+        for (var todo in state.filteredTodos) {
+          final originalTodo = mockTodos.firstWhere((t) => t.id == todo.id);
+          expect(todo.tags, equals(originalTodo.tags));
+        }
+      });
+
+      test('filteredTodos preserves tags when filtering by status', () {
+        final state = TodosOverviewState(
+          todos: mockTodos,
+          filter: TodosViewFilter.activeOnly,
+        );
+        final expectedTodos = mockTodos.where((todo) => !todo.isCompleted).toList();
+        expect(state.filteredTodos, equals(expectedTodos));
+
+        for (var todo in state.filteredTodos) {
+          final originalTodo = mockTodos.firstWhere((t) => t.id == todo.id);
+          expect(todo.tags, equals(originalTodo.tags));
+        }
+      });
     });
   });
 }

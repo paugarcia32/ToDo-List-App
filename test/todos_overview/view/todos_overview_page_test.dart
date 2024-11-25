@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:todo_app/edit_todo/view/edit_todo_page.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:mockingjay/mockingjay.dart';
 import 'package:todos_repository/todos_repository.dart';
@@ -19,17 +20,20 @@ void main() {
       id: '1',
       title: 'title 1',
       description: 'description 1',
+      tags: ['work', 'urgent'],
     ),
     Todo(
       id: '2',
       title: 'title 2',
       description: 'description 2',
+      tags: ['personal', 'later'],
     ),
     Todo(
       id: '3',
       title: 'title 3',
       description: 'description 3',
       isCompleted: true,
+      tags: ['shopping', 'important', 'Prueba'],
     ),
   ];
 
@@ -64,14 +68,9 @@ void main() {
   });
 
   group('TodosOverviewView', () {
-    late MockNavigator navigator;
     late TodosOverviewBloc todosOverviewBloc;
 
     setUp(() {
-      navigator = MockNavigator();
-      when(() => navigator.canPop()).thenReturn(false);
-      when(() => navigator.push<void>(any())).thenAnswer((_) async {});
-
       todosOverviewBloc = MockTodosOverviewBloc();
       when(() => todosOverviewBloc.state).thenReturn(
         TodosOverviewState(
@@ -85,12 +84,9 @@ void main() {
     });
 
     Widget buildSubject() {
-      return MockNavigatorProvider(
-        navigator: navigator,
-        child: BlocProvider.value(
-          value: todosOverviewBloc,
-          child: const TodosOverviewView(),
-        ),
+      return BlocProvider.value(
+        value: todosOverviewBloc,
+        child: const TodosOverviewView(),
       );
     }
 
@@ -337,24 +333,42 @@ void main() {
       );
 
       testWidgets(
-        'navigates to EditTodoPage '
-        'when TodoListTile.onTap is called',
+        'shows EditTodoView in bottom sheet '
+        'when TodoListTile is tapped',
         (tester) async {
           await tester.pumpApp(
             buildSubject(),
             todosRepository: todosRepository,
           );
 
-          final todoListTile = tester.widget<TodoListTile>(
-            find.byType(TodoListTile).first,
-          );
-          todoListTile.onTap!();
+          await tester.tap(find.byType(TodoListTile).first);
+          await tester.pumpAndSettle();
 
-          verify(
-            () => navigator.push<void>(any(that: isRoute<void>())),
-          ).called(1);
+          expect(find.byType(EditTodoView), findsOneWidget);
         },
       );
+
+      testWidgets('displays tags in TodoListTile', (tester) async {
+        await tester.pumpApp(
+          buildSubject(),
+          todosRepository: todosRepository,
+        );
+
+        for (var todo in mockTodos) {
+          final todoTileFinder = find.widgetWithText(TodoListTile, todo.title);
+          expect(todoTileFinder, findsOneWidget);
+
+          for (var tag in todo.tags ?? []) {
+            expect(
+              find.descendant(
+                of: todoTileFinder,
+                matching: find.widgetWithText(Chip, tag),
+              ),
+              findsOneWidget,
+            );
+          }
+        }
+      });
     });
   });
 }
