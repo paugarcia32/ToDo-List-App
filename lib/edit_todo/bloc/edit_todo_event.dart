@@ -28,12 +28,29 @@ final class EditTodoDescriptionChanged extends EditTodoEvent {
 final class EditTodoTagsChanged extends EditTodoEvent {
   const EditTodoTagsChanged(this.tags);
 
-  final List<String>? tags;
+  final List<Tag> tags;
 
   @override
-  List<Object> get props => [tags ?? []];
+  List<Object> get props => [tags];
+}
+
+final class EditTodoAvailableTagsFetched extends EditTodoEvent {
+  const EditTodoAvailableTagsFetched();
+}
+
+final class EditTodoTagToggled extends EditTodoEvent {
+  const EditTodoTagToggled(this.tag);
+
+  final Tag tag;
+
+  @override
+  List<Object> get props => [tag];
 }
 
 final class EditTodoSubmitted extends EditTodoEvent {
   const EditTodoSubmitted();
+}
+
+final class EditTodoLoadTags extends EditTodoEvent {
+  const EditTodoLoadTags();
 }

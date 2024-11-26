@@ -54,7 +54,7 @@ class StatsView extends StatelessWidget {
           ListTile(
             key: const Key('statsView_totalTags_listTile'),
             leading: const Icon(Icons.tag),
-            title: Text("Tags"),
+            title: Text("Unique Tags Count"),
             trailing: Text(
               '${state.totalTags}',
               style: textTheme.headlineSmall,

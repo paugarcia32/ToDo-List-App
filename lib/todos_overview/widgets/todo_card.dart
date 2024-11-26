@@ -8,12 +8,14 @@ class TodoCard extends StatelessWidget {
     this.onToggleCompleted,
     this.onTap,
     super.key,
+    this.tagTitles,
   });
 
   final Todo todo;
   final bool isLast;
   final ValueChanged<bool>? onToggleCompleted;
   final VoidCallback? onTap;
+  final List<String>? tagTitles;
 
   @override
   Widget build(BuildContext context) {
@@ -74,12 +76,12 @@ class TodoCard extends StatelessWidget {
                             style: theme.textTheme.bodySmall,
                           ),
                         ),
-                      if (todo.tags!.isNotEmpty)
+                      if (todo.tagIds.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Wrap(
                             spacing: 8,
-                            children: todo.tags!
+                            children: tagTitles!
                                 .map((tag) => Text(
                                       tag,
                                       style: theme.textTheme.bodySmall?.copyWith(

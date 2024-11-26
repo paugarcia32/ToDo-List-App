@@ -6,12 +6,14 @@ final class TodosOverviewState extends Equatable {
   const TodosOverviewState({
     this.status = TodosOverviewStatus.initial,
     this.todos = const [],
+    this.tags = const [],
     this.filter = TodosViewFilter.all,
     this.lastDeletedTodo,
   });
 
   final TodosOverviewStatus status;
   final List<Todo> todos;
+  final List<Tag> tags;
   final TodosViewFilter filter;
   final Todo? lastDeletedTodo;
 
@@ -20,12 +22,14 @@ final class TodosOverviewState extends Equatable {
   TodosOverviewState copyWith({
     TodosOverviewStatus Function()? status,
     List<Todo> Function()? todos,
+    List<Tag>? tags,
     TodosViewFilter Function()? filter,
     Todo? Function()? lastDeletedTodo,
   }) {
     return TodosOverviewState(
       status: status != null ? status() : this.status,
       todos: todos != null ? todos() : this.todos,
+      tags: tags ?? this.tags,
       filter: filter != null ? filter() : this.filter,
       lastDeletedTodo: lastDeletedTodo != null ? lastDeletedTodo() : this.lastDeletedTodo,
     );
@@ -35,6 +39,7 @@ final class TodosOverviewState extends Equatable {
   List<Object?> get props => [
         status,
         todos,
+        tags,
         filter,
         lastDeletedTodo,
       ];

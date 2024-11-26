@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'todo.dart';
+part of 'tag.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Todo _$TodoFromJson(Map<String, dynamic> json) => Todo(
+Tag _$TagFromJson(Map<String, dynamic> json) => Tag(
       title: json['title'] as String,
       id: json['id'] as String?,
-      description: json['description'] as String? ?? '',
-      isCompleted: json['isCompleted'] as bool? ?? false,
-      tagIds: (json['tagIds'] as List<dynamic>?)
+      isArchived: json['isArchived'] as bool? ?? false,
+      color: json['color'] as String? ?? '#FFFFFF',
+      todoIds: (json['todoIds'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],
     );
 
-Map<String, dynamic> _$TodoToJson(Todo instance) => <String, dynamic>{
+Map<String, dynamic> _$TagToJson(Tag instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
-      'description': instance.description,
-      'isCompleted': instance.isCompleted,
-      'tagIds': instance.tagIds,
+      'isArchived': instance.isArchived,
+      'color': instance.color,
+      'todoIds': instance.todoIds,
     };

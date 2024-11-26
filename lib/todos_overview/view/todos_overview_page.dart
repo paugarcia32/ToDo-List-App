@@ -31,7 +31,7 @@ class TodosOverviewView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.todosOverviewAppBarTitle),
-        titleTextStyle: TextStyle(fontSize: 20),
+        titleTextStyle: const TextStyle(fontSize: 20),
         toolbarHeight: 45,
         actions: const [
           TodosOverviewFilterButton(),
@@ -98,11 +98,16 @@ class TodosOverviewView extends StatelessWidget {
               }
             }
 
+            final Map<String, String> tagMap = {for (var tag in state.tags) tag.id: tag.title};
+
             return CupertinoScrollbar(
               child: ListView.builder(
                 itemCount: state.filteredTodos.length,
                 itemBuilder: (_, index) {
                   final todo = state.filteredTodos.elementAt(index);
+
+                  final tagTitles = todo.tagIds.map((id) => tagMap[id] ?? 'Desconocido').toList();
+
                   return TodoListTile(
                     todo: todo,
                     isLast: index == state.filteredTodos.length - 1,
@@ -142,6 +147,7 @@ class TodosOverviewView extends StatelessWidget {
                         },
                       );
                     },
+                    tagTitles: tagTitles,
                   );
                 },
               ),

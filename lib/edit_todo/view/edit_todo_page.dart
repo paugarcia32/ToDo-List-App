@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/edit_todo/edit_todo.dart';
 import 'package:todo_app/l10n/l10n.dart';
+import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
 
 class EditTodoPage extends StatelessWidget {
@@ -154,53 +155,60 @@ class _TagsField extends StatefulWidget {
 class _TagsFieldState extends State<_TagsField> {
   final TextEditingController _controller = TextEditingController();
   List<String> _allTags = [];
-  StreamSubscription<List<Todo>>? _todosSubscription;
+  StreamSubscription<List<Tag>>? _tagsSubscription;
 
   @override
   void initState() {
     super.initState();
     _loadAllTags();
+    print(_loadAllTags);
+
+    // Forzar actualización para debug
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
   }
 
   void _loadAllTags() {
     final todosRepository = context.read<TodosRepository>();
-    _todosSubscription = todosRepository.getTodos().listen((todos) {
-      final Set<String> tagsSet = {};
-      for (var todo in todos) {
-        tagsSet.addAll(todo.tags ?? []);
-      }
+    _tagsSubscription = todosRepository.getTags().listen((tags) {
       setState(() {
-        _allTags = tagsSet.toList();
+        _allTags = tags.map((tag) => tag.title).toList(); // Guardamos los títulos de los tags
       });
     });
   }
 
-  void _addTag(String tag) {
-    if (tag.trim().isEmpty) return;
+  void _addTag(String tagTitle) {
+    if (tagTitle.trim().isEmpty) return;
 
     final bloc = context.read<EditTodoBloc>();
-    final tags = List<String>.from(bloc.state.tags);
-    final newTag = tag.trim();
+    final todosRepository = context.read<TodosRepository>();
+    final tags = List<Tag>.from(bloc.state.selectedTags);
+    final newTagTitle = tagTitle.trim();
 
-    if (!tags.contains(newTag)) {
+    if (!tags.any((tag) => tag.title == newTagTitle)) {
+      final newTag = Tag(title: newTagTitle);
       tags.add(newTag);
       bloc.add(EditTodoTagsChanged(tags));
+
+      // Guarda el nuevo tag en el repositorio
+      todosRepository.saveTag(newTag);
     }
 
     _controller.clear();
   }
 
-  void _removeTag(String tag) {
+  void _removeTag(Tag tag) {
     final bloc = context.read<EditTodoBloc>();
-    final tags = List<String>.from(bloc.state.tags);
+    final tags = List<Tag>.from(bloc.state.selectedTags);
 
-    tags.remove(tag);
+    tags.removeWhere((t) => t.id == tag.id);
     bloc.add(EditTodoTagsChanged(tags));
   }
 
   @override
   void dispose() {
-    _todosSubscription?.cancel();
+    _tagsSubscription?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -208,7 +216,7 @@ class _TagsFieldState extends State<_TagsField> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditTodoBloc>().state;
-    final tags = state.tags;
+    final tags = state.selectedTags;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +231,7 @@ class _TagsFieldState extends State<_TagsField> {
           children: tags
               .map(
                 (tag) => InputChip(
-                  label: Text(tag),
+                  label: Text(tag.title),
                   onDeleted: () => _removeTag(tag),
                 ),
               )

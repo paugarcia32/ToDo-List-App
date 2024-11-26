@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
 
 part 'edit_todo_event.dart';
@@ -12,15 +13,21 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
   })  : _todosRepository = todosRepository,
         super(
           EditTodoState(
-              initialTodo: initialTodo,
-              title: initialTodo?.title ?? '',
-              description: initialTodo?.description ?? '',
-              tags: initialTodo?.tags ?? []),
+            initialTodo: initialTodo,
+            title: initialTodo?.title ?? '',
+            description: initialTodo?.description ?? '',
+            selectedTags: [], // Inicializamos como lista vacía
+          ),
         ) {
     on<EditTodoTitleChanged>(_onTitleChanged);
     on<EditTodoDescriptionChanged>(_onDescriptionChanged);
+    on<EditTodoTagToggled>(_onTagToggled);
     on<EditTodoTagsChanged>(_onTagsChanged);
+    on<EditTodoLoadTags>(_onLoadTags);
     on<EditTodoSubmitted>(_onSubmitted);
+
+    // Disparamos el evento para cargar los tags
+    add(const EditTodoLoadTags());
   }
 
   final TodosRepository _todosRepository;
@@ -39,8 +46,46 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     emit(state.copyWith(description: event.description));
   }
 
-  void _onTagsChanged(EditTodoTagsChanged event, Emitter<EditTodoState> emit) {
-    emit(state.copyWith(tags: event.tags));
+  void _onTagToggled(
+    EditTodoTagToggled event,
+    Emitter<EditTodoState> emit,
+  ) {
+    final updatedTags = [...state.selectedTags];
+    if (updatedTags.contains(event.tag)) {
+      updatedTags.remove(event.tag);
+    } else {
+      updatedTags.add(event.tag);
+    }
+    emit(state.copyWith(selectedTags: updatedTags));
+  }
+
+  void _onTagsChanged(
+    EditTodoTagsChanged event,
+    Emitter<EditTodoState> emit,
+  ) {
+    emit(state.copyWith(selectedTags: event.tags));
+  }
+
+  Future<void> _onLoadTags(
+    EditTodoLoadTags event,
+    Emitter<EditTodoState> emit,
+  ) async {
+    if (state.initialTodo != null && state.initialTodo!.tagIds.isNotEmpty) {
+      final tagIds = state.initialTodo!.tagIds;
+
+      final allTags = await _todosRepository.getTags().first;
+
+      final selectedTags = allTags.where((tag) => tagIds.contains(tag.id)).toList();
+
+      print('Tags seleccionados: ${selectedTags.map((tag) => tag.title).toList()}');
+
+      emit(state.copyWith(selectedTags: selectedTags));
+      print('tagIds en el Todo inicial: ${state.initialTodo!.tagIds}');
+    } else {
+      print('No hay Todo inicial o no tiene tags.');
+    }
+
+    print('tagIds en el Todo inicial: ${state.initialTodo?.tagIds}');
   }
 
   Future<void> _onSubmitted(
@@ -48,18 +93,19 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     Emitter<EditTodoState> emit,
   ) async {
     emit(state.copyWith(status: EditTodoStatus.loading));
-    final todo = (state.initialTodo ?? Todo(title: ''))
-        .copyWith(title: state.title, description: state.description, tags: state.tags);
+    final todo = (state.initialTodo ?? Todo(title: '')).copyWith(
+      title: state.title,
+      description: state.description,
+      tagIds: state.selectedTags.map((tag) => tag.id).toList(),
+    );
 
     try {
       await _todosRepository.saveTodo(todo);
       emit(state.copyWith(status: EditTodoStatus.success));
-      // Resetear el estado después de un pequeño delay para que se vea el cambio de estado
       await Future.delayed(const Duration(milliseconds: 500));
       emit(state.copyWith(status: EditTodoStatus.initial));
     } catch (e) {
       emit(state.copyWith(status: EditTodoStatus.failure));
-      // También resetear el estado después de un fallo
       await Future.delayed(const Duration(milliseconds: 500));
       emit(state.copyWith(status: EditTodoStatus.initial));
     }

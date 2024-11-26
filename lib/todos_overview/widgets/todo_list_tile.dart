@@ -5,11 +5,12 @@ import 'package:todos_repository/todos_repository.dart';
 class TodoListTile extends StatelessWidget {
   const TodoListTile({
     required this.todo,
-    super.key,
+    required this.isLast,
     this.onToggleCompleted,
     this.onDismissed,
     this.onTap,
-    required this.isLast,
+    this.tagTitles,
+    super.key,
   });
 
   final Todo todo;
@@ -17,6 +18,7 @@ class TodoListTile extends StatelessWidget {
   final ValueChanged<bool>? onToggleCompleted;
   final DismissDirectionCallback? onDismissed;
   final VoidCallback? onTap;
+  final List<String>? tagTitles;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,7 @@ class TodoListTile extends StatelessWidget {
         isLast: isLast,
         onToggleCompleted: onToggleCompleted,
         onTap: onTap,
+        tagTitles: tagTitles,
       ),
     );
   }

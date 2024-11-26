@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
+import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'todos_overview_event.dart';
 part 'todos_overview_state.dart';
@@ -28,16 +30,29 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
   ) async {
     emit(state.copyWith(status: () => TodosOverviewStatus.loading));
 
-    await emit.forEach<List<Todo>>(
-      _todosRepository.getTodos(),
-      onData: (todos) => state.copyWith(
-        status: () => TodosOverviewStatus.success,
-        todos: () => todos,
-      ),
-      onError: (_, __) => state.copyWith(
-        status: () => TodosOverviewStatus.failure,
-      ),
-    );
+    try {
+      final combinedStream = Rx.combineLatest2<List<Todo>, List<Tag>, Tuple2<List<Todo>, List<Tag>>>(
+        _todosRepository.getTodos(),
+        _todosRepository.getTags(),
+        (todos, tags) => Tuple2(todos, tags),
+      );
+
+      await emit.forEach<Tuple2<List<Todo>, List<Tag>>>(
+        combinedStream,
+        onData: (data) {
+          final todos = data.item1;
+          final tags = data.item2;
+          return state.copyWith(
+            status: () => TodosOverviewStatus.success,
+            todos: () => todos,
+            tags: tags,
+          );
+        },
+        onError: (_, __) => state.copyWith(status: () => TodosOverviewStatus.failure),
+      );
+    } catch (_) {
+      emit(state.copyWith(status: () => TodosOverviewStatus.failure));
+    }
   }
 
   Future<void> _onTodoCompletionToggled(
@@ -91,4 +106,11 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
   ) async {
     await _todosRepository.clearCompleted();
   }
+}
+
+class Tuple2<T1, T2> {
+  final T1 item1;
+  final T2 item2;
+
+  Tuple2(this.item1, this.item2);
 }

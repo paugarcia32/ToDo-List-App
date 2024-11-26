@@ -6,11 +6,7 @@ import 'package:rxdart/subjects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todos_api/todos_api.dart';
 
-/// {@template local_storage_todos_api}
-/// A Flutter implementation of the [TodosApi] that uses local storage.
-/// {@endtemplate}
 class LocalStorageTodosApi extends TodosApi {
-  /// {@macro local_storage_todos_api}
   LocalStorageTodosApi({
     required SharedPreferences plugin,
   }) : _plugin = plugin {
@@ -23,12 +19,13 @@ class LocalStorageTodosApi extends TodosApi {
     const [],
   );
 
-  /// The key used for storing the todos locally.
-  ///
-  /// This is only exposed for testing and shouldn't be used by consumers of
-  /// this library.
+  late final _tagStreamController = BehaviorSubject<List<Tag>>.seeded(const []);
+
   @visibleForTesting
   static const kTodosCollectionKey = '__todos_collection_key__';
+
+  @visibleForTesting
+  static const kTagsCollectionKey = '__tags_collection_key__';
 
   String? _getValue(String key) => _plugin.getString(key);
   Future<void> _setValue(String key, String value) => _plugin.setString(key, value);
@@ -42,6 +39,16 @@ class LocalStorageTodosApi extends TodosApi {
       _todoStreamController.add(todos);
     } else {
       _todoStreamController.add(const []);
+    }
+
+    final tagsJson = _getValue(kTagsCollectionKey);
+    if (tagsJson != null) {
+      final tags = List<Map<dynamic, dynamic>>.from(
+        json.decode(tagsJson) as List,
+      ).map((jsonMap) => Tag.fromJson(Map<String, dynamic>.from(jsonMap))).toList();
+      _tagStreamController.add(tags);
+    } else {
+      _tagStreamController.add(const []);
     }
   }
 
@@ -98,7 +105,50 @@ class LocalStorageTodosApi extends TodosApi {
   }
 
   @override
-  Future<void> close() {
-    return _todoStreamController.close();
+  Future<void> deleteTag(String id) async {
+    final tags = [..._tagStreamController.value];
+    final tagIndex = tags.indexWhere((t) => t.id == id);
+
+    if (tagIndex == -1) {
+      throw TagNotFoundException();
+    } else {
+      tags.removeAt(tagIndex);
+      _tagStreamController.add(tags);
+      await _setValue(kTagsCollectionKey, json.encode(tags));
+    }
+  }
+
+  @override
+  Stream<List<Tag>> getTags() {
+    final tags = _tagStreamController.value;
+    print('Tags emitidos desde el repositorio: ${tags.map((tag) => tag.title).toList()}');
+    return _tagStreamController.asBroadcastStream();
+  }
+
+  @override
+  Future<List<Todo>> getTodosByTag(String tagId) async {
+    final todos = [..._todoStreamController.value];
+    return todos.where((todo) => todo.tagIds.contains(tagId)).toList();
+  }
+
+  @override
+  Future<void> saveTag(Tag tag) async {
+    final tags = [..._tagStreamController.value];
+    final tagIndex = tags.indexWhere((t) => t.id == tag.id);
+
+    if (tagIndex >= 0) {
+      tags[tagIndex] = tag;
+    } else {
+      tags.add(tag);
+    }
+
+    _tagStreamController.add(tags);
+    await _setValue(kTagsCollectionKey, json.encode(tags));
+  }
+
+  @override
+  Future<void> close() async {
+    await _todoStreamController.close();
+    await _tagStreamController.close();
   }
 }
