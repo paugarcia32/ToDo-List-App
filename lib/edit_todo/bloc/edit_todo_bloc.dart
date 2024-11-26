@@ -16,7 +16,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
             initialTodo: initialTodo,
             title: initialTodo?.title ?? '',
             description: initialTodo?.description ?? '',
-            selectedTags: [], // Inicializamos como lista vacía
+            selectedTags: [],
           ),
         ) {
     on<EditTodoTitleChanged>(_onTitleChanged);
@@ -26,7 +26,6 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     on<EditTodoLoadTags>(_onLoadTags);
     on<EditTodoSubmitted>(_onSubmitted);
 
-    // Disparamos el evento para cargar los tags
     add(const EditTodoLoadTags());
   }
 

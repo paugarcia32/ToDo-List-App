@@ -49,7 +49,7 @@ class HomeView extends StatelessWidget {
                 listenWhen: (previous, current) =>
                     previous.status != current.status && current.status == EditTodoStatus.success,
                 listener: (context, state) {
-                  Navigator.of(bottomSheetContext).pop(); // Cierra el Bottom Sheet
+                  Navigator.of(bottomSheetContext).pop();
                 },
                 child: const EditTodoView(),
               ),

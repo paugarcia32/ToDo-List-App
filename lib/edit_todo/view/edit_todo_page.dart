@@ -77,7 +77,6 @@ class EditTodoView extends StatelessWidget {
               child: status.isLoadingOrSuccess
                   ? const CupertinoActivityIndicator()
                   : Text(
-                      // isNewTodo ? l10n.addTodoButtonTooltip : l10n.editTodoSaveButtonTooltip,
                       isNewTodo ? l10n.editTodoAddAppBarTitle : l10n.editTodoEditAppBarTitle,
                     ),
             ),
@@ -163,7 +162,6 @@ class _TagsFieldState extends State<_TagsField> {
     _loadAllTags();
     print(_loadAllTags);
 
-    // Forzar actualización para debug
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {});
     });
@@ -183,7 +181,6 @@ class _TagsFieldState extends State<_TagsField> {
 
     final bloc = context.read<EditTodoBloc>();
     final todosRepository = context.read<TodosRepository>();
-    final tags = List<Tag>.from(bloc.state.selectedTags);
     final newTagTitle = tagTitle.trim();
 
     final allTags = await todosRepository.getTags().first;
@@ -193,9 +190,19 @@ class _TagsFieldState extends State<_TagsField> {
       orElse: () => Tag(title: ''),
     );
 
-    if (!tags.any((tag) => tag.id == existingTag.id)) {
-      tags.add(existingTag);
-      bloc.add(EditTodoTagsChanged(tags));
+    final selectedTags = List<Tag>.from(bloc.state.selectedTags);
+
+    if (existingTag.id.isNotEmpty) {
+      if (!selectedTags.any((tag) => tag.id == existingTag.id)) {
+        selectedTags.add(existingTag);
+        bloc.add(EditTodoTagsChanged(selectedTags));
+      }
+    } else {
+      final newTag = Tag(title: newTagTitle);
+      selectedTags.add(newTag);
+      bloc.add(EditTodoTagsChanged(selectedTags));
+
+      await todosRepository.saveTag(newTag);
     }
 
     _controller.clear();
