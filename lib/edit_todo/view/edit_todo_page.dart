@@ -178,7 +178,7 @@ class _TagsFieldState extends State<_TagsField> {
     });
   }
 
-  void _addTag(String tagTitle) {
+  void _addTag(String tagTitle) async {
     if (tagTitle.trim().isEmpty) return;
 
     final bloc = context.read<EditTodoBloc>();
@@ -186,12 +186,16 @@ class _TagsFieldState extends State<_TagsField> {
     final tags = List<Tag>.from(bloc.state.selectedTags);
     final newTagTitle = tagTitle.trim();
 
-    if (!tags.any((tag) => tag.title == newTagTitle)) {
-      final newTag = Tag(title: newTagTitle);
-      tags.add(newTag);
-      bloc.add(EditTodoTagsChanged(tags));
+    final allTags = await todosRepository.getTags().first;
 
-      todosRepository.saveTag(newTag);
+    final existingTag = allTags.firstWhere(
+      (tag) => tag.title.toLowerCase() == newTagTitle.toLowerCase(),
+      orElse: () => Tag(title: ''),
+    );
+
+    if (!tags.any((tag) => tag.id == existingTag.id)) {
+      tags.add(existingTag);
+      bloc.add(EditTodoTagsChanged(tags));
     }
 
     _controller.clear();
