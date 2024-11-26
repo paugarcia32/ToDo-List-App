@@ -173,7 +173,7 @@ class _TagsFieldState extends State<_TagsField> {
     final todosRepository = context.read<TodosRepository>();
     _tagsSubscription = todosRepository.getTags().listen((tags) {
       setState(() {
-        _allTags = tags.map((tag) => tag.title).toList(); // Guardamos los títulos de los tags
+        _allTags = tags.map((tag) => tag.title).toList();
       });
     });
   }
@@ -191,7 +191,6 @@ class _TagsFieldState extends State<_TagsField> {
       tags.add(newTag);
       bloc.add(EditTodoTagsChanged(tags));
 
-      // Guarda el nuevo tag en el repositorio
       todosRepository.saveTag(newTag);
     }
 
@@ -239,7 +238,6 @@ class _TagsFieldState extends State<_TagsField> {
         ),
         const SizedBox(height: 8),
         Autocomplete<String>(
-          optionsViewOpenDirection: OptionsViewOpenDirection.up,
           optionsBuilder: (TextEditingValue textEditingValue) {
             if (textEditingValue.text.isEmpty) {
               return const Iterable<String>.empty();
@@ -248,11 +246,16 @@ class _TagsFieldState extends State<_TagsField> {
               return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
             });
           },
+          optionsViewOpenDirection: OptionsViewOpenDirection.up,
           onSelected: (String selection) {
             _addTag(selection);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _controller.clear();
+            });
           },
           fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController,
               FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+            _controller.value = fieldTextEditingController.value;
             return TextField(
               controller: fieldTextEditingController,
               focusNode: fieldFocusNode,
@@ -261,11 +264,15 @@ class _TagsFieldState extends State<_TagsField> {
                 hintText: 'Enter a tag',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.add),
-                  onPressed: () => _addTag(fieldTextEditingController.text),
+                  onPressed: () {
+                    _addTag(fieldTextEditingController.text);
+                    fieldTextEditingController.clear();
+                  },
                 ),
               ),
               onSubmitted: (String value) {
                 _addTag(value);
+                fieldTextEditingController.clear();
               },
             );
           },
