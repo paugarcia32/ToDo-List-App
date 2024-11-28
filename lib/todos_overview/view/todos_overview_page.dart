@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todo_app/edit_todo/bloc/edit_todo_bloc.dart';
+import 'package:todo_app/edit_todo/view/edit_todo_page.dart';
 import 'package:todo_app/l10n/l10n.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_repository/todos_repository.dart';
@@ -54,7 +56,6 @@ class TodosOverviewView extends StatelessWidget {
             listenWhen: (previous, current) => previous.tagsStatus != current.tagsStatus,
             listener: (context, state) {
               if (state.tagsStatus == TodosOverviewStatus.failure) {
-                // Manejar error en la carga de Tags
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(
@@ -116,7 +117,31 @@ class TodosOverviewView extends StatelessWidget {
                     onDismissed: (_) {
                       context.read<TodosOverviewBloc>().add(TodosOverviewTodoDeleted(todo));
                     },
-                    onTap: () {},
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        builder: (bottomSheetContext) {
+                          return BlocProvider(
+                            create: (context) => EditTodoBloc(
+                              todosRepository: context.read<TodosRepository>(),
+                              initialTodo: todo,
+                            ),
+                            child: BlocListener<EditTodoBloc, EditTodoState>(
+                              listenWhen: (previous, current) =>
+                                  previous.status != current.status && current.status == EditTodoStatus.success,
+                              listener: (context, state) {
+                                Navigator.of(bottomSheetContext).pop();
+                              },
+                              child: const EditTodoView(),
+                            ),
+                          );
+                        },
+                      );
+                    },
                     tagTitles: tagTitles,
                   );
                 },

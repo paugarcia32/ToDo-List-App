@@ -29,13 +29,11 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     TodosOverviewSubscriptionRequested event,
     Emitter<TodosOverviewState> emit,
   ) async {
-    // Emitir estado de carga inicial
     emit(state.copyWith(
       todosStatus: () => TodosOverviewStatus.loading,
       tagsStatus: () => TodosOverviewStatus.loading,
     ));
 
-    // Disparar eventos para suscribirse a los streams de Todos y Tags
     add(const TodosOverviewTodosSubscriptionRequested());
     add(const TodosOverviewTagsSubscriptionRequested());
   }

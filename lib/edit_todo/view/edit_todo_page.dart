@@ -153,7 +153,7 @@ class _TagsField extends StatefulWidget {
 }
 
 class _TagsFieldState extends State<_TagsField> {
-  final TextEditingController _controller = TextEditingController();
+  TextEditingController? _fieldTextEditingController;
   List<String> _allTags = [];
   StreamSubscription<List<Tag>>? _tagsSubscription;
 
@@ -161,11 +161,6 @@ class _TagsFieldState extends State<_TagsField> {
   void initState() {
     super.initState();
     _loadAllTags();
-    print(_loadAllTags);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {});
-    });
   }
 
   void _loadAllTags() {
@@ -205,7 +200,9 @@ class _TagsFieldState extends State<_TagsField> {
       bloc.add(EditTodoTagsChanged(selectedTags));
     }
 
-    _controller.clear();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fieldTextEditingController?.clear();
+    });
   }
 
   void _removeTag(Tag tag) {
@@ -219,7 +216,6 @@ class _TagsFieldState extends State<_TagsField> {
   @override
   void dispose() {
     _tagsSubscription?.cancel();
-    _controller.dispose();
     super.dispose();
   }
 
@@ -231,9 +227,7 @@ class _TagsFieldState extends State<_TagsField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Tags',
-        ),
+        const Text('Tags'),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -261,12 +255,12 @@ class _TagsFieldState extends State<_TagsField> {
           onSelected: (String selection) {
             _addTag(selection);
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              _controller.clear();
+              _fieldTextEditingController?.clear();
             });
           },
           fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController,
               FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
-            _controller.value = fieldTextEditingController.value;
+            _fieldTextEditingController = fieldTextEditingController;
             return TextField(
               controller: fieldTextEditingController,
               focusNode: fieldFocusNode,
@@ -276,14 +270,18 @@ class _TagsFieldState extends State<_TagsField> {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
-                    _addTag(fieldTextEditingController.text);
-                    fieldTextEditingController.clear();
+                    _addTag(_fieldTextEditingController?.text ?? '');
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _fieldTextEditingController?.clear();
+                    });
                   },
                 ),
               ),
               onSubmitted: (String value) {
                 _addTag(value);
-                fieldTextEditingController.clear();
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _fieldTextEditingController?.clear();
+                });
               },
             );
           },
