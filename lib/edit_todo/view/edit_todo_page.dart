@@ -200,9 +200,7 @@ class _TagsFieldState extends State<_TagsField> {
       bloc.add(EditTodoTagsChanged(selectedTags));
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fieldTextEditingController?.clear();
-    });
+    _fieldTextEditingController?.clear();
   }
 
   void _removeTag(Tag tag) {
@@ -254,9 +252,7 @@ class _TagsFieldState extends State<_TagsField> {
           optionsViewOpenDirection: OptionsViewOpenDirection.up,
           onSelected: (String selection) {
             _addTag(selection);
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _fieldTextEditingController?.clear();
-            });
+            _fieldTextEditingController?.clear();
           },
           fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController,
               FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
@@ -270,18 +266,14 @@ class _TagsFieldState extends State<_TagsField> {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
-                    _addTag(_fieldTextEditingController?.text ?? '');
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _fieldTextEditingController?.clear();
-                    });
+                    _addTag(fieldTextEditingController.text);
+                    fieldTextEditingController.clear();
                   },
                 ),
               ),
               onSubmitted: (String value) {
                 _addTag(value);
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _fieldTextEditingController?.clear();
-                });
+                fieldTextEditingController.clear();
               },
             );
           },
