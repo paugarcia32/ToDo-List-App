@@ -98,15 +98,23 @@ class TodosOverviewView extends StatelessWidget {
               }
             }
 
-            final Map<String, String> tagMap = {for (var tag in state.tags) tag.id: tag.title};
-
             return CupertinoScrollbar(
               child: ListView.builder(
                 itemCount: state.filteredTodos.length,
                 itemBuilder: (_, index) {
                   final todo = state.filteredTodos.elementAt(index);
 
-                  final tagTitles = todo.tagIds.map((id) => tagMap[id] ?? 'Desconocido').toList();
+                  final Map<String, String> tagMap = {
+                    for (var tag in state.tags) tag.id: tag.title,
+                  };
+
+                  final tagTitles = todo.tagIds.map((id) {
+                    final tagTitle = tagMap[id];
+                    if (tagTitle == null) {
+                      print('ID del tag no encontrado en tagMap: $id');
+                    }
+                    return tagTitle ?? 'Desconocido';
+                  }).toList();
 
                   return TodoListTile(
                     todo: todo,

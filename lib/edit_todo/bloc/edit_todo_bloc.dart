@@ -101,6 +101,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     try {
       await _todosRepository.saveTodo(todo);
       emit(state.copyWith(status: EditTodoStatus.success));
+      print('Tags en el todo guardado: ${todo.tagIds}');
       await Future.delayed(const Duration(milliseconds: 500));
       emit(state.copyWith(status: EditTodoStatus.initial));
     } catch (e) {

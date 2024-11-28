@@ -42,13 +42,17 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
         onData: (data) {
           final todos = data.item1;
           final tags = data.item2;
+
           return state.copyWith(
             status: () => TodosOverviewStatus.success,
             todos: () => todos,
             tags: tags,
           );
         },
-        onError: (_, __) => state.copyWith(status: () => TodosOverviewStatus.failure),
+        onError: (_, __) {
+          print('Error al combinar los streams');
+          return state.copyWith(status: () => TodosOverviewStatus.failure);
+        },
       );
     } catch (_) {
       emit(state.copyWith(status: () => TodosOverviewStatus.failure));

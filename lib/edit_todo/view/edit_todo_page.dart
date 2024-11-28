@@ -8,6 +8,7 @@ import 'package:todo_app/edit_todo/edit_todo.dart';
 import 'package:todo_app/l10n/l10n.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
+import 'package:collection/collection.dart';
 
 class EditTodoPage extends StatelessWidget {
   const EditTodoPage({super.key});
@@ -185,24 +186,23 @@ class _TagsFieldState extends State<_TagsField> {
 
     final allTags = await todosRepository.getTags().first;
 
-    final existingTag = allTags.firstWhere(
+    final existingTag = allTags.firstWhereOrNull(
       (tag) => tag.title.toLowerCase() == newTagTitle.toLowerCase(),
-      orElse: () => Tag(title: ''),
     );
 
     final selectedTags = List<Tag>.from(bloc.state.selectedTags);
 
-    if (existingTag.id.isNotEmpty) {
+    if (existingTag != null) {
       if (!selectedTags.any((tag) => tag.id == existingTag.id)) {
         selectedTags.add(existingTag);
         bloc.add(EditTodoTagsChanged(selectedTags));
       }
     } else {
       final newTag = Tag(title: newTagTitle);
+      await todosRepository.saveTag(newTag);
+
       selectedTags.add(newTag);
       bloc.add(EditTodoTagsChanged(selectedTags));
-
-      await todosRepository.saveTag(newTag);
     }
 
     _controller.clear();

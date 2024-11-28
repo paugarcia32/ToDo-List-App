@@ -48,7 +48,7 @@ class LocalStorageTodosApi extends TodosApi {
       ).map((jsonMap) => Tag.fromJson(Map<String, dynamic>.from(jsonMap))).toList();
       _tagStreamController.add(tags);
     } else {
-      _tagStreamController.add(const []);
+      _tagStreamController.add([]);
     }
   }
 
@@ -120,8 +120,6 @@ class LocalStorageTodosApi extends TodosApi {
 
   @override
   Stream<List<Tag>> getTags() {
-    final tags = _tagStreamController.value;
-    print('Tags emitidos desde el repositorio: ${tags.map((tag) => tag.title).toList()}');
     return _tagStreamController.asBroadcastStream();
   }
 
@@ -143,6 +141,7 @@ class LocalStorageTodosApi extends TodosApi {
     }
 
     _tagStreamController.add(tags);
+
     await _setValue(kTagsCollectionKey, json.encode(tags));
   }
 
