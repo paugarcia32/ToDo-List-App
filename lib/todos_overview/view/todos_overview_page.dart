@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo_app/edit_todo/bloc/edit_todo_bloc.dart';
-import 'package:todo_app/edit_todo/view/edit_todo_page.dart';
 import 'package:todo_app/l10n/l10n.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_repository/todos_repository.dart';
@@ -31,8 +29,6 @@ class TodosOverviewView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.todosOverviewAppBarTitle),
-        titleTextStyle: const TextStyle(fontSize: 20),
-        toolbarHeight: 45,
         actions: const [
           TodosOverviewFilterButton(),
           TodosOverviewOptionsButton(),
@@ -41,9 +37,9 @@ class TodosOverviewView extends StatelessWidget {
       body: MultiBlocListener(
         listeners: [
           BlocListener<TodosOverviewBloc, TodosOverviewState>(
-            listenWhen: (previous, current) => previous.status != current.status,
+            listenWhen: (previous, current) => previous.todosStatus != current.todosStatus,
             listener: (context, state) {
-              if (state.status == TodosOverviewStatus.failure) {
+              if (state.todosStatus == TodosOverviewStatus.failure) {
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(
@@ -55,47 +51,40 @@ class TodosOverviewView extends StatelessWidget {
             },
           ),
           BlocListener<TodosOverviewBloc, TodosOverviewState>(
-            listenWhen: (previous, current) =>
-                previous.lastDeletedTodo != current.lastDeletedTodo && current.lastDeletedTodo != null,
+            listenWhen: (previous, current) => previous.tagsStatus != current.tagsStatus,
             listener: (context, state) {
-              final deletedTodo = state.lastDeletedTodo!;
-              final messenger = ScaffoldMessenger.of(context);
-              messenger
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      l10n.todosOverviewTodoDeletedSnackbarText(
-                        deletedTodo.title,
-                      ),
+              if (state.tagsStatus == TodosOverviewStatus.failure) {
+                // Manejar error en la carga de Tags
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('Error al cargar las etiquetas.'),
                     ),
-                    action: SnackBarAction(
-                      label: l10n.todosOverviewUndoDeletionButtonText,
-                      onPressed: () {
-                        messenger.hideCurrentSnackBar();
-                        context.read<TodosOverviewBloc>().add(const TodosOverviewUndoDeletionRequested());
-                      },
-                    ),
-                  ),
-                );
+                  );
+              }
             },
           ),
         ],
         child: BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
           builder: (context, state) {
-            if (state.todos.isEmpty) {
-              if (state.status == TodosOverviewStatus.loading) {
-                return const Center(child: CupertinoActivityIndicator());
-              } else if (state.status != TodosOverviewStatus.success) {
-                return const SizedBox();
-              } else {
-                return Center(
-                  child: Text(
-                    l10n.todosOverviewEmptyText,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                );
-              }
+            if (state.todosStatus == TodosOverviewStatus.loading || state.tagsStatus == TodosOverviewStatus.loading) {
+              return const Center(child: CupertinoActivityIndicator());
+            } else if (state.todosStatus == TodosOverviewStatus.failure ||
+                state.tagsStatus == TodosOverviewStatus.failure) {
+              return Center(
+                child: Text(
+                  l10n.todosOverviewErrorSnackbarText,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              );
+            } else if (state.todos.isEmpty) {
+              return Center(
+                child: Text(
+                  l10n.todosOverviewEmptyText,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              );
             }
 
             return CupertinoScrollbar(
@@ -110,9 +99,6 @@ class TodosOverviewView extends StatelessWidget {
 
                   final tagTitles = todo.tagIds.map((id) {
                     final tagTitle = tagMap[id];
-                    if (tagTitle == null) {
-                      print('ID del tag no encontrado en tagMap: $id');
-                    }
                     return tagTitle ?? 'Desconocido';
                   }).toList();
 
@@ -130,31 +116,7 @@ class TodosOverviewView extends StatelessWidget {
                     onDismissed: (_) {
                       context.read<TodosOverviewBloc>().add(TodosOverviewTodoDeleted(todo));
                     },
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                        ),
-                        builder: (bottomSheetContext) {
-                          return BlocProvider(
-                            create: (context) => EditTodoBloc(
-                              todosRepository: context.read<TodosRepository>(),
-                              initialTodo: todo,
-                            ),
-                            child: BlocListener<EditTodoBloc, EditTodoState>(
-                              listenWhen: (previous, current) =>
-                                  previous.status != current.status && current.status == EditTodoStatus.success,
-                              listener: (context, state) {
-                                Navigator.of(bottomSheetContext).pop();
-                              },
-                              child: const EditTodoView(),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                    onTap: () {},
                     tagTitles: tagTitles,
                   );
                 },

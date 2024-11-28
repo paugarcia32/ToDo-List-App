@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
-import 'package:rxdart/rxdart.dart';
 
 part 'todos_overview_event.dart';
 part 'todos_overview_state.dart';
@@ -14,6 +13,8 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
   })  : _todosRepository = todosRepository,
         super(const TodosOverviewState()) {
     on<TodosOverviewSubscriptionRequested>(_onSubscriptionRequested);
+    on<TodosOverviewTodosSubscriptionRequested>(_onTodosSubscriptionRequested);
+    on<TodosOverviewTagsSubscriptionRequested>(_onTagsSubscriptionRequested);
     on<TodosOverviewTodoCompletionToggled>(_onTodoCompletionToggled);
     on<TodosOverviewTodoDeleted>(_onTodoDeleted);
     on<TodosOverviewUndoDeletionRequested>(_onUndoDeletionRequested);
@@ -28,34 +29,58 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     TodosOverviewSubscriptionRequested event,
     Emitter<TodosOverviewState> emit,
   ) async {
-    emit(state.copyWith(status: () => TodosOverviewStatus.loading));
+    // Emitir estado de carga inicial
+    emit(state.copyWith(
+      todosStatus: () => TodosOverviewStatus.loading,
+      tagsStatus: () => TodosOverviewStatus.loading,
+    ));
 
+    // Disparar eventos para suscribirse a los streams de Todos y Tags
+    add(const TodosOverviewTodosSubscriptionRequested());
+    add(const TodosOverviewTagsSubscriptionRequested());
+  }
+
+  Future<void> _onTodosSubscriptionRequested(
+    TodosOverviewTodosSubscriptionRequested event,
+    Emitter<TodosOverviewState> emit,
+  ) async {
     try {
-      final combinedStream = Rx.combineLatest2<List<Todo>, List<Tag>, Tuple2<List<Todo>, List<Tag>>>(
+      await emit.forEach<List<Todo>>(
         _todosRepository.getTodos(),
-        _todosRepository.getTags(),
-        (todos, tags) => Tuple2(todos, tags),
-      );
-
-      await emit.forEach<Tuple2<List<Todo>, List<Tag>>>(
-        combinedStream,
-        onData: (data) {
-          final todos = data.item1;
-          final tags = data.item2;
-
-          return state.copyWith(
-            status: () => TodosOverviewStatus.success,
-            todos: () => todos,
-            tags: tags,
-          );
-        },
-        onError: (_, __) {
-          print('Error al combinar los streams');
-          return state.copyWith(status: () => TodosOverviewStatus.failure);
-        },
+        onData: (todos) => state.copyWith(
+          todosStatus: () => TodosOverviewStatus.success,
+          todos: () => todos,
+        ),
+        onError: (_, __) => state.copyWith(
+          todosStatus: () => TodosOverviewStatus.failure,
+        ),
       );
     } catch (_) {
-      emit(state.copyWith(status: () => TodosOverviewStatus.failure));
+      emit(state.copyWith(
+        todosStatus: () => TodosOverviewStatus.failure,
+      ));
+    }
+  }
+
+  Future<void> _onTagsSubscriptionRequested(
+    TodosOverviewTagsSubscriptionRequested event,
+    Emitter<TodosOverviewState> emit,
+  ) async {
+    try {
+      await emit.forEach<List<Tag>>(
+        _todosRepository.getTags(),
+        onData: (tags) => state.copyWith(
+          tagsStatus: () => TodosOverviewStatus.success,
+          tags: tags,
+        ),
+        onError: (_, __) => state.copyWith(
+          tagsStatus: () => TodosOverviewStatus.failure,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(
+        tagsStatus: () => TodosOverviewStatus.failure,
+      ));
     }
   }
 
@@ -81,7 +106,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
   ) async {
     assert(
       state.lastDeletedTodo != null,
-      'Last deleted todo can not be null.',
+      'Last deleted todo cannot be null.',
     );
 
     final todo = state.lastDeletedTodo!;
@@ -110,11 +135,4 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
   ) async {
     await _todosRepository.clearCompleted();
   }
-}
-
-class Tuple2<T1, T2> {
-  final T1 item1;
-  final T2 item2;
-
-  Tuple2(this.item1, this.item2);
 }
