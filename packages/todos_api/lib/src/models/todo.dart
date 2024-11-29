@@ -15,26 +15,27 @@ class Todo extends Equatable {
     String? id,
     this.description = '',
     this.isCompleted = false,
-    this.tagIds = const <String>[],
+    Set<String>? tagIds,
   })  : assert(
           id == null || id.isNotEmpty,
           'id must either be null or not empty',
         ),
-        id = id ?? const Uuid().v4();
+        id = id ?? const Uuid().v4(),
+        tagIds = tagIds ?? <String>{};
 
   final String id;
   final String title;
   final String description;
   final bool isCompleted;
 
-  final List<String> tagIds;
+  final Set<String> tagIds;
 
   Todo copyWith({
     String? id,
     String? title,
     String? description,
     bool? isCompleted,
-    List<String>? tagIds,
+    Set<String>? tagIds,
   }) {
     return Todo(
       id: id ?? this.id,

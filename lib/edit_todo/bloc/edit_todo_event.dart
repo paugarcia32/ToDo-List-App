@@ -28,7 +28,7 @@ final class EditTodoDescriptionChanged extends EditTodoEvent {
 final class EditTodoTagsChanged extends EditTodoEvent {
   const EditTodoTagsChanged(this.tags);
 
-  final List<Tag> tags;
+  final Set<Tag> tags;
 
   @override
   List<Object> get props => [tags];

@@ -14,22 +14,23 @@ class Tag extends Equatable {
     String? id,
     this.isArchived = false,
     this.color = '#FFFFFF',
-    this.todoIds = const <String>[],
+    Set<String>? todoIds,
   })  : assert(title.isNotEmpty, 'Title cannot be empty'),
-        id = id?.isNotEmpty == true ? id! : const Uuid().v4();
+        id = id?.isNotEmpty == true ? id! : const Uuid().v4(),
+        todoIds = todoIds ?? <String>{};
 
   final String id;
   final String title;
   final bool isArchived;
   final String color;
-  final List<String> todoIds;
+  final Set<String> todoIds;
 
   Tag copyWith({
     String? id,
     String? title,
     bool? isArchived,
     String? color,
-    List<String>? todoIds,
+    Set<String>? todoIds,
   }) {
     return Tag(
       id: id ?? this.id,

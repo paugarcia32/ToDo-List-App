@@ -185,7 +185,7 @@ class _TagsFieldState extends State<_TagsField> {
       (tag) => tag.title.toLowerCase() == newTagTitle.toLowerCase(),
     );
 
-    final selectedTags = List<Tag>.from(bloc.state.selectedTags);
+    final selectedTags = Set<Tag>.from(bloc.state.selectedTags);
 
     if (existingTag != null) {
       if (!selectedTags.any((tag) => tag.id == existingTag.id)) {
@@ -205,7 +205,7 @@ class _TagsFieldState extends State<_TagsField> {
 
   void _removeTag(Tag tag) {
     final bloc = context.read<EditTodoBloc>();
-    final tags = List<Tag>.from(bloc.state.selectedTags);
+    final tags = Set<Tag>.from(bloc.state.selectedTags);
 
     tags.removeWhere((t) => t.id == tag.id);
     bloc.add(EditTodoTagsChanged(tags));
@@ -258,6 +258,7 @@ class _TagsFieldState extends State<_TagsField> {
               FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
             _fieldTextEditingController = fieldTextEditingController;
             return TextField(
+              key: const Key('editTodoView_tags_textField'),
               controller: fieldTextEditingController,
               focusNode: fieldFocusNode,
               decoration: InputDecoration(

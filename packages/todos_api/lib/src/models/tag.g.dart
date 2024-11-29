@@ -11,10 +11,8 @@ Tag _$TagFromJson(Map<String, dynamic> json) => Tag(
       id: json['id'] as String?,
       isArchived: json['isArchived'] as bool? ?? false,
       color: json['color'] as String? ?? '#FFFFFF',
-      todoIds: (json['todoIds'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
+      todoIds:
+          (json['todoIds'] as List<dynamic>?)?.map((e) => e as String).toSet(),
     );
 
 Map<String, dynamic> _$TagToJson(Tag instance) => <String, dynamic>{
@@ -22,5 +20,5 @@ Map<String, dynamic> _$TagToJson(Tag instance) => <String, dynamic>{
       'title': instance.title,
       'isArchived': instance.isArchived,
       'color': instance.color,
-      'todoIds': instance.todoIds,
+      'todoIds': instance.todoIds.toList(),
     };

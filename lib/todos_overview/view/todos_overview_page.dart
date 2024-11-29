@@ -106,6 +106,7 @@ class TodosOverviewView extends StatelessWidget {
                   return TodoListTile(
                     todo: todo,
                     isLast: index == state.filteredTodos.length - 1,
+                    tagTitles: tagTitles,
                     onToggleCompleted: (isCompleted) {
                       context.read<TodosOverviewBloc>().add(
                             TodosOverviewTodoCompletionToggled(
@@ -142,7 +143,6 @@ class TodosOverviewView extends StatelessWidget {
                         },
                       );
                     },
-                    tagTitles: tagTitles,
                   );
                 },
               ),

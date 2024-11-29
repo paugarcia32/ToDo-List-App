@@ -16,7 +16,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
             initialTodo: initialTodo,
             title: initialTodo?.title ?? '',
             description: initialTodo?.description ?? '',
-            selectedTags: [],
+            selectedTags: {},
           ),
         ) {
     on<EditTodoTitleChanged>(_onTitleChanged);
@@ -49,7 +49,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     EditTodoTagToggled event,
     Emitter<EditTodoState> emit,
   ) {
-    final updatedTags = [...state.selectedTags];
+    final updatedTags = Set<Tag>.from(state.selectedTags);
     if (updatedTags.contains(event.tag)) {
       updatedTags.remove(event.tag);
     } else {
@@ -74,7 +74,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
 
       final allTags = await _todosRepository.getTags().first;
 
-      final selectedTags = allTags.where((tag) => tagIds.contains(tag.id)).toList();
+      final selectedTags = allTags.where((tag) => tagIds.contains(tag.id)).toSet();
 
       print('Tags seleccionados: ${selectedTags.map((tag) => tag.title).toList()}');
 
@@ -95,7 +95,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     final todo = (state.initialTodo ?? Todo(title: '')).copyWith(
       title: state.title,
       description: state.description,
-      tagIds: state.selectedTags.map((tag) => tag.id).toList(),
+      tagIds: state.selectedTags.map((tag) => tag.id).toSet(),
     );
 
     try {
