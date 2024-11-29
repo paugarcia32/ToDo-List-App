@@ -13,7 +13,6 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     required TodosRepository todosRepository,
   })  : _todosRepository = todosRepository,
         super(const TodosOverviewState()) {
-    on<TodosOverviewSubscriptionRequested>(_onSubscriptionRequested);
     on<TodosOverviewTodosSubscriptionRequested>(_onTodosSubscriptionRequested);
     on<TodosOverviewTagsSubscriptionRequested>(_onTagsSubscriptionRequested);
     on<TodosOverviewTodoCompletionToggled>(_onTodoCompletionToggled);
@@ -26,23 +25,12 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
 
   final TodosRepository _todosRepository;
 
-  Future<void> _onSubscriptionRequested(
-    TodosOverviewSubscriptionRequested event,
-    Emitter<TodosOverviewState> emit,
-  ) async {
-    emit(state.copyWith(
-      todosStatus: () => TodosOverviewStatus.loading,
-      tagsStatus: () => TodosOverviewStatus.loading,
-    ));
-
-    add(const TodosOverviewTodosSubscriptionRequested());
-    add(const TodosOverviewTagsSubscriptionRequested());
-  }
-
   Future<void> _onTodosSubscriptionRequested(
     TodosOverviewTodosSubscriptionRequested event,
     Emitter<TodosOverviewState> emit,
   ) async {
+    emit(state.copyWith(todosStatus: () => TodosOverviewStatus.loading));
+
     try {
       await emit.forEach<List<Todo>>(
         _todosRepository.getTodos(),
@@ -68,6 +56,8 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     TodosOverviewTagsSubscriptionRequested event,
     Emitter<TodosOverviewState> emit,
   ) async {
+    emit(state.copyWith(tagsStatus: () => TodosOverviewStatus.loading));
+
     try {
       await emit.forEach<List<Tag>>(
         _todosRepository.getTags(),

@@ -12,10 +12,15 @@ class TodosOverviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final todosOverviewBloc = TodosOverviewBloc(
+      todosRepository: context.read<TodosRepository>(),
+    );
+
+    todosOverviewBloc.add(const TodosOverviewTodosSubscriptionRequested());
+    todosOverviewBloc.add(const TodosOverviewTagsSubscriptionRequested());
+
     return BlocProvider(
-      create: (context) => TodosOverviewBloc(
-        todosRepository: context.read<TodosRepository>(),
-      )..add(const TodosOverviewSubscriptionRequested()),
+      create: (context) => todosOverviewBloc,
       child: const TodosOverviewView(),
     );
   }
