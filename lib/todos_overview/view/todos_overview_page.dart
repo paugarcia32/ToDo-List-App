@@ -79,7 +79,7 @@ class TodosOverviewView extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               );
-            } else if (state.todos.isEmpty) {
+            } else if (state.todosWithTags.isEmpty) {
               return Center(
                 child: Text(
                   l10n.todosOverviewEmptyText,
@@ -90,22 +90,15 @@ class TodosOverviewView extends StatelessWidget {
 
             return CupertinoScrollbar(
               child: ListView.builder(
-                itemCount: state.filteredTodos.length,
+                itemCount: state.todosWithTags.length,
                 itemBuilder: (_, index) {
-                  final todo = state.filteredTodos.elementAt(index);
-
-                  final Map<String, String> tagMap = {
-                    for (var tag in state.tags) tag.id: tag.title,
-                  };
-
-                  final tagTitles = todo.tagIds.map((id) {
-                    final tagTitle = tagMap[id];
-                    return tagTitle ?? 'Desconocido';
-                  }).toList();
+                  final todoWithTags = state.todosWithTags[index];
+                  final todo = todoWithTags.todo;
+                  final tagTitles = todoWithTags.tagTitles;
 
                   return TodoListTile(
                     todo: todo,
-                    isLast: index == state.filteredTodos.length - 1,
+                    isLast: index == state.todosWithTags.length - 1,
                     tagTitles: tagTitles,
                     onToggleCompleted: (isCompleted) {
                       context.read<TodosOverviewBloc>().add(
