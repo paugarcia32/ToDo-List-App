@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todos_repository/todos_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todo_app/todos_overview/bloc/tags_bloc.dart';
+import 'package:todos_api/todos_api.dart';
 
 class TodoCard extends StatelessWidget {
   const TodoCard({
@@ -79,17 +81,8 @@ class TodoCard extends StatelessWidget {
                       if (todo.tagIds.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
-                          child: Wrap(
-                            spacing: 8,
-                            children: tagTitles!
-                                .map((tag) => Text(
-                                      tag,
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        fontSize: 12,
-                                        color: captionColor,
-                                      ),
-                                    ))
-                                .toList(),
+                          child: TagChips(
+                            tagIds: todo.tagIds,
                           ),
                         ),
                     ],
@@ -101,6 +94,40 @@ class TodoCard extends StatelessWidget {
         ),
         if (!isLast) const Divider(thickness: 0.5, indent: 16, endIndent: 16),
       ],
+    );
+  }
+}
+
+class TagChips extends StatelessWidget {
+  const TagChips({required this.tagIds, Key? key}) : super(key: key);
+
+  final Set<String> tagIds;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final captionColor = theme.textTheme.bodySmall?.color?.withOpacity(0.6);
+    return BlocSelector<TagsBloc, TagsState, List<Tag>>(
+      selector: (state) => state.tags,
+      builder: (context, tags) {
+        final tagMap = {for (var tag in tags) tag.id: tag.title};
+        final tagTitles = tagIds.map((id) => tagMap[id] ?? 'Desconocido').toList();
+
+        return Wrap(
+          spacing: 4,
+          children: tagTitles
+              .map(
+                (tag) => Text(
+                  tag,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 12,
+                    color: captionColor,
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      },
     );
   }
 }

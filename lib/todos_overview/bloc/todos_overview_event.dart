@@ -15,10 +15,6 @@ class TodosOverviewTodosSubscriptionRequested extends TodosOverviewEvent {
   const TodosOverviewTodosSubscriptionRequested();
 }
 
-class TodosOverviewTagsSubscriptionRequested extends TodosOverviewEvent {
-  const TodosOverviewTagsSubscriptionRequested();
-}
-
 class TodosOverviewTodoCompletionToggled extends TodosOverviewEvent {
   const TodosOverviewTodoCompletionToggled({
     required this.todo,
