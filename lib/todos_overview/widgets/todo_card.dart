@@ -107,11 +107,11 @@ class TagChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final captionColor = theme.textTheme.bodySmall?.color?.withOpacity(0.6);
-    return BlocSelector<TagsBloc, TagsState, List<Tag>>(
-      selector: (state) => state.tags,
-      builder: (context, tags) {
-        final tagMap = {for (var tag in tags) tag.id: tag.title};
-        final tagTitles = tagIds.map((id) => tagMap[id] ?? 'Desconocido').toList();
+
+    return BlocSelector<TagsBloc, TagsState, Map<String, String>>(
+      selector: (state) => state.tagIdToTitleMap,
+      builder: (context, tagIdToTitleMap) {
+        final tagTitles = tagIds.map((id) => tagIdToTitleMap[id] ?? 'Desconocido').toList();
 
         return Wrap(
           spacing: 4,

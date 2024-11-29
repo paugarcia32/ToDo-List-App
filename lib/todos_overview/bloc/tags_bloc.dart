@@ -27,10 +27,14 @@ class TagsBloc extends Bloc<TagsEvent, TagsState> {
     try {
       await emit.forEach<List<Tag>>(
         _todosRepository.getTags(),
-        onData: (tags) => state.copyWith(
-          status: TagsStatus.success,
-          tags: tags,
-        ),
+        onData: (tags) {
+          final tagIdToTitleMap = {for (var tag in tags) tag.id: tag.title};
+          return state.copyWith(
+            status: TagsStatus.success,
+            tags: tags,
+            tagIdToTitleMap: tagIdToTitleMap,
+          );
+        },
         onError: (_, __) => state.copyWith(
           status: TagsStatus.failure,
         ),

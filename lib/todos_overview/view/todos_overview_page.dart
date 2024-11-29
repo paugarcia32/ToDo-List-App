@@ -84,7 +84,6 @@ class TodosOverviewView extends StatelessWidget {
                 return const Center(child: CupertinoActivityIndicator());
               }
 
-              // Manejar estados de error
               if (todosState.status == TodosOverviewStatus.failure || tagsState.status == TagsStatus.failure) {
                 return Center(
                   child: Text(
@@ -94,7 +93,6 @@ class TodosOverviewView extends StatelessWidget {
                 );
               }
 
-              // Verificar si hay tareas
               if (todosState.todos.isEmpty) {
                 return Center(
                   child: Text(
@@ -113,7 +111,6 @@ class TodosOverviewView extends StatelessWidget {
                     return TodoListTile(
                       todo: todo,
                       isLast: index == todosState.filteredTodos.length - 1,
-                      // tagTitles: tagTitles,
                       onToggleCompleted: (isCompleted) {
                         context.read<TodosOverviewBloc>().add(
                               TodosOverviewTodoCompletionToggled(
