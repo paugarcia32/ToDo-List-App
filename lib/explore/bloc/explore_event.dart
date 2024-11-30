@@ -10,3 +10,12 @@ sealed class ExploreEvent extends Equatable {
 final class TagsSubscriptionRequested extends ExploreEvent {
   const TagsSubscriptionRequested();
 }
+
+class TagDeleted extends ExploreEvent {
+  const TagDeleted(this.tagId);
+
+  final String tagId;
+
+  @override
+  List<Object> get props => [tagId];
+}

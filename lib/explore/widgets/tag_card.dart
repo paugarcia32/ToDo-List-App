@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todos_api/todos_api.dart';
 
 class TagCard extends StatelessWidget {
   const TagCard({
@@ -8,7 +9,7 @@ class TagCard extends StatelessWidget {
     super.key,
   });
 
-  final String tag;
+  final Tag tag;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
@@ -33,7 +34,7 @@ class TagCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    tag,
+                    tag.title,
                     style: theme.textTheme.bodyLarge,
                   ),
                 ),

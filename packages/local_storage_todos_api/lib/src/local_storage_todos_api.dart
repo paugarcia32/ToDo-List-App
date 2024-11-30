@@ -188,6 +188,23 @@ class LocalStorageTodosApi extends TodosApi {
       tags.removeAt(tagIndex);
       _tagStreamController.add(tags);
       await _setValue(kTagsCollectionKey, json.encode(tags));
+
+      final todos = [..._todoStreamController.value];
+      bool todosUpdated = false;
+
+      for (int i = 0; i < todos.length; i++) {
+        final todo = todos[i];
+        if (todo.tagIds.contains(id)) {
+          final updatedTagIds = Set<String>.from(todo.tagIds)..remove(id);
+          todos[i] = todo.copyWith(tagIds: updatedTagIds);
+          todosUpdated = true;
+        }
+      }
+
+      if (todosUpdated) {
+        _todoStreamController.add(todos);
+        await _setValue(kTodosCollectionKey, json.encode(todos));
+      }
     }
   }
 

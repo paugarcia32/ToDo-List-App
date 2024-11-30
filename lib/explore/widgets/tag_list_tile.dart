@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todos_api/todos_api.dart';
 import 'tag_card.dart';
 
 class TagListTile extends StatelessWidget {
@@ -9,14 +10,14 @@ class TagListTile extends StatelessWidget {
     super.key,
   });
 
-  final String tag;
+  final Tag tag;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key('tagListTile_dismissible_$tag'),
+      key: Key('tagListTile_dismissible_${tag.id}'),
       onDismissed: (direction) {
         if (onDelete != null) {
           onDelete!();

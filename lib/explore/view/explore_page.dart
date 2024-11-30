@@ -25,7 +25,6 @@ class ExploreView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    // final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -69,6 +68,9 @@ class ExploreView extends StatelessWidget {
                           return TagListTile(
                             tag: tag,
                             onTap: () {},
+                            onDelete: () {
+                              context.read<ExploreBloc>().add(TagDeleted(tag.id));
+                            },
                           );
                         },
                         separatorBuilder: (context, index) => const SizedBox(height: 0.0),

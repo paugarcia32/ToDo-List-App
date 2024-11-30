@@ -5,12 +5,12 @@ enum ExploreStatus { initial, loading, success, failure }
 final class ExploreState extends Equatable {
   const ExploreState({
     this.status = ExploreStatus.initial,
-    this.tags = const <String>{},
+    this.tags = const <Tag>{},
     this.numOfTodos = 0,
   });
 
   final ExploreStatus status;
-  final Set<String> tags;
+  final Set<Tag> tags;
   final int numOfTodos;
 
   @override
@@ -22,7 +22,7 @@ final class ExploreState extends Equatable {
 
   ExploreState copyWith({
     ExploreStatus? status,
-    Set<String>? tags,
+    Set<Tag>? tags,
     int? numOfTodos,
   }) {
     return ExploreState(
