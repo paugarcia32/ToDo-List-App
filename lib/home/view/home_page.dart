@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/edit_todo/edit_todo.dart';
+import 'package:todo_app/explore/view/explore_page.dart';
 import 'package:todo_app/home/home.dart';
 import 'package:todo_app/stats/stats.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
@@ -28,7 +29,7 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       body: IndexedStack(
         index: selectedTab.index,
-        children: const [TodosOverviewPage(), StatsPage()],
+        children: const [TodosOverviewPage(), StatsPage(), ExplorePage()],
       ),
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
@@ -68,6 +69,7 @@ class HomeView extends StatelessWidget {
             icon: Icon(Icons.show_chart_rounded),
             label: 'Stats',
           ),
+          NavigationDestination(icon: Icon(Icons.explore), label: 'Explore')
         ],
         selectedIndex: selectedTab.index,
         onDestinationSelected: (index) {
