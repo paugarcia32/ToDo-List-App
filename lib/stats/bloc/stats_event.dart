@@ -7,6 +7,10 @@ sealed class StatsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-final class StatsSubscriptionRequested extends StatsEvent {
-  const StatsSubscriptionRequested();
+final class TodosSubscriptionRequested extends StatsEvent {
+  const TodosSubscriptionRequested();
+}
+
+final class TagsSubscriptionRequested extends StatsEvent {
+  const TagsSubscriptionRequested();
 }

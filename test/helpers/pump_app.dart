@@ -13,6 +13,12 @@ extension PumpApp on WidgetTester {
     Widget widget, {
     TodosRepository? todosRepository,
   }) {
+    final repository = todosRepository ?? MockTodosRepository();
+
+    if (repository is MockTodosRepository) {
+      when(() => repository.getTodos()).thenAnswer((_) => Stream.value([]));
+    }
+
     return pumpWidget(
       RepositoryProvider.value(
         value: todosRepository ?? MockTodosRepository(),

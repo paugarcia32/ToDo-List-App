@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
+import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
 
 part 'todos_overview_event.dart';
@@ -26,18 +27,25 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     TodosOverviewSubscriptionRequested event,
     Emitter<TodosOverviewState> emit,
   ) async {
-    emit(state.copyWith(status: () => TodosOverviewStatus.loading));
-
-    await emit.forEach<List<Todo>>(
-      _todosRepository.getTodos(),
-      onData: (todos) => state.copyWith(
-        status: () => TodosOverviewStatus.success,
-        todos: () => todos,
-      ),
-      onError: (_, __) => state.copyWith(
+    emit(state.copyWith(
+      status: () => TodosOverviewStatus.loading,
+    ));
+    try {
+      await emit.forEach<List<Todo>>(
+        _todosRepository.getTodos(),
+        onData: (todos) => state.copyWith(
+          status: () => TodosOverviewStatus.success,
+          todos: () => todos,
+        ),
+        onError: (_, __) => state.copyWith(
+          status: () => TodosOverviewStatus.failure,
+        ),
+      );
+    } catch (_) {
+      emit(state.copyWith(
         status: () => TodosOverviewStatus.failure,
-      ),
-    );
+      ));
+    }
   }
 
   Future<void> _onTodoCompletionToggled(
@@ -62,7 +70,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
   ) async {
     assert(
       state.lastDeletedTodo != null,
-      'Last deleted todo can not be null.',
+      'Last deleted todo cannot be null.',
     );
 
     final todo = state.lastDeletedTodo!;

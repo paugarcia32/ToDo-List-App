@@ -12,7 +12,9 @@ class StatsPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => StatsBloc(
         todosRepository: context.read<TodosRepository>(),
-      )..add(const StatsSubscriptionRequested()),
+      )
+        ..add(const TodosSubscriptionRequested())
+        ..add(const TagsSubscriptionRequested()),
       child: const StatsView(),
     );
   }
@@ -33,25 +35,50 @@ class StatsView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          ListTile(
-            key: const Key('statsView_completedTodos_listTile'),
-            leading: const Icon(Icons.check_rounded),
-            title: Text(l10n.statsCompletedTodoCountLabel),
-            trailing: Text(
-              '${state.completedTodos}',
-              style: textTheme.headlineSmall,
+          if (state.status == StatsStatus.loading) const Center(child: CircularProgressIndicator()),
+          if (state.status == StatsStatus.failure) const Center(child: Text('Error loading data')),
+          if (state.status == StatsStatus.success) ...[
+            _buildStatsTile(
+              key: const Key('statsView_completedTodos_listTile'),
+              icon: Icons.check_rounded,
+              label: l10n.statsCompletedTodoCountLabel,
+              value: '${state.completedTodos}',
+              textTheme: textTheme,
             ),
-          ),
-          ListTile(
-            key: const Key('statsView_activeTodos_listTile'),
-            leading: const Icon(Icons.radio_button_unchecked_rounded),
-            title: Text(l10n.statsActiveTodoCountLabel),
-            trailing: Text(
-              '${state.activeTodos}',
-              style: textTheme.headlineSmall,
+            _buildStatsTile(
+              key: const Key('statsView_activeTodos_listTile'),
+              icon: Icons.radio_button_unchecked_rounded,
+              label: l10n.statsActiveTodoCountLabel,
+              value: '${state.activeTodos}',
+              textTheme: textTheme,
             ),
-          ),
+            _buildStatsTile(
+              key: const Key('statsView_totalTags_listTile'),
+              icon: Icons.tag,
+              label: "Unique Tags Count",
+              value: '${state.totalTags}',
+              textTheme: textTheme,
+            ),
+          ]
         ],
+      ),
+    );
+  }
+
+  Widget _buildStatsTile({
+    required Key key,
+    required IconData icon,
+    required String label,
+    required String value,
+    required TextTheme textTheme,
+  }) {
+    return ListTile(
+      key: key,
+      leading: Icon(icon),
+      title: Text(label),
+      trailing: Text(
+        value,
+        style: textTheme.headlineSmall,
       ),
     );
   }

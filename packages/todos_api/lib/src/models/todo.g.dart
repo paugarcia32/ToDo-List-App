@@ -11,6 +11,8 @@ Todo _$TodoFromJson(Map<String, dynamic> json) => Todo(
       id: json['id'] as String?,
       description: json['description'] as String? ?? '',
       isCompleted: json['isCompleted'] as bool? ?? false,
+      tagIds:
+          (json['tagIds'] as List<dynamic>?)?.map((e) => e as String).toSet(),
     );
 
 Map<String, dynamic> _$TodoToJson(Todo instance) => <String, dynamic>{
@@ -18,4 +20,5 @@ Map<String, dynamic> _$TodoToJson(Todo instance) => <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
       'isCompleted': instance.isCompleted,
+      'tagIds': instance.tagIds.toList(),
     };

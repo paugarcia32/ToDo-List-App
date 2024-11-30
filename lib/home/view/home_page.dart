@@ -26,47 +26,54 @@ class HomeView extends StatelessWidget {
     final selectedTab = context.select((HomeCubit cubit) => cubit.state.tab);
 
     return Scaffold(
-        body: IndexedStack(
-          index: selectedTab.index,
-          children: const [TodosOverviewPage(), StatsPage()],
-        ),
-        // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          shape: const CircleBorder(),
-          key: const Key('homeView_addTodo_floatingActionButton'),
-          onPressed: () => showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            builder: (context) {
-              return BlocProvider(
-                create: (context) => EditTodoBloc(
-                  todosRepository: context.read<TodosRepository>(),
-                  initialTodo: null,
-                ),
-                child: const EditTodoView(),
-              );
-            },
+      body: IndexedStack(
+        index: selectedTab.index,
+        children: const [TodosOverviewPage(), StatsPage()],
+      ),
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        key: const Key('homeView_addTodo_floatingActionButton'),
+        onPressed: () => showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
-          child: const Icon(Icons.add),
-        ),
-        bottomNavigationBar: NavigationBar(
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.list_rounded),
-              label: 'Todos',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.show_chart_rounded),
-              label: 'Stats',
-            ),
-          ],
-          selectedIndex: selectedTab.index,
-          onDestinationSelected: (index) {
-            context.read<HomeCubit>().setTab(HomeTab.values[index]);
+          builder: (bottomSheetContext) {
+            return BlocProvider(
+              create: (context) => EditTodoBloc(
+                todosRepository: context.read<TodosRepository>(),
+                initialTodo: null,
+              ),
+              child: BlocListener<EditTodoBloc, EditTodoState>(
+                listenWhen: (previous, current) =>
+                    previous.status != current.status && current.status == EditTodoStatus.success,
+                listener: (context, state) {
+                  Navigator.of(bottomSheetContext).pop();
+                },
+                child: const EditTodoView(),
+              ),
+            );
           },
-        ));
+        ),
+        child: const Icon(Icons.add),
+      ),
+      bottomNavigationBar: NavigationBar(
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.list_rounded),
+            label: 'Todos',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.show_chart_rounded),
+            label: 'Stats',
+          ),
+        ],
+        selectedIndex: selectedTab.index,
+        onDestinationSelected: (index) {
+          context.read<HomeCubit>().setTab(HomeTab.values[index]);
+        },
+      ),
+    );
   }
 }

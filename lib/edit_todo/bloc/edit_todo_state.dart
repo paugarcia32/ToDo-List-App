@@ -15,12 +15,14 @@ final class EditTodoState extends Equatable {
     this.initialTodo,
     this.title = '',
     this.description = '',
+    this.selectedTags = const {},
   });
 
   final EditTodoStatus status;
   final Todo? initialTodo;
   final String title;
   final String description;
+  final Set<Tag> selectedTags;
 
   bool get isNewTodo => initialTodo == null;
 
@@ -29,15 +31,19 @@ final class EditTodoState extends Equatable {
     Todo? initialTodo,
     String? title,
     String? description,
+    Set<Tag>? selectedTags,
   }) {
     return EditTodoState(
       status: status ?? this.status,
       initialTodo: initialTodo ?? this.initialTodo,
       title: title ?? this.title,
       description: description ?? this.description,
+      selectedTags: selectedTags ?? this.selectedTags,
     );
   }
 
+  Iterable<Tag> get tags => selectedTags;
+
   @override
-  List<Object?> get props => [status, initialTodo, title, description];
+  List<Object?> get props => [status, initialTodo, title, description, selectedTags];
 }
