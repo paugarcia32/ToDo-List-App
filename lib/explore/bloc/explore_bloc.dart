@@ -23,7 +23,7 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   ) async {
     emit(state.copyWith(status: ExploreStatus.loading));
 
-    emit.forEach<List<Tag>>(
+    await emit.forEach<List<Tag>>(
       todosRepository.getTags(),
       onData: (tagsList) => state.copyWith(
         status: ExploreStatus.success,

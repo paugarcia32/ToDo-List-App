@@ -57,7 +57,7 @@ class LocalStorageTodosApi extends TodosApi {
 
   @override
   Future<void> saveTodo(Todo todo) async {
-    final todos = [..._todoStreamController.value];
+    final todos = List<Todo>.from(_todoStreamController.value);
     final todoIndex = todos.indexWhere((t) => t.id == todo.id);
 
     Set<String> oldTagIds = {};
@@ -76,31 +76,37 @@ class LocalStorageTodosApi extends TodosApi {
     final addedTagIds = newTagIds.difference(oldTagIds);
     final removedTagIds = oldTagIds.difference(newTagIds);
 
-    final tags = [..._tagStreamController.value];
+    final tags = List<Tag>.from(_tagStreamController.value);
 
-    for (final tagId in addedTagIds) {
+    void _updateTagForTodo(List<Tag> tags, String tagId, String todoId, bool add) {
       final tagIndex = tags.indexWhere((t) => t.id == tagId);
       if (tagIndex >= 0) {
         final tag = tags[tagIndex];
-        final updatedTodoIds = Set<String>.from(tag.todoIds)..add(todo.id);
+        final updatedTodoIds = Set<String>.from(tag.todoIds);
+        if (add) {
+          updatedTodoIds.add(todoId);
+        } else {
+          updatedTodoIds.remove(todoId);
+        }
         tags[tagIndex] = tag.copyWith(todoIds: updatedTodoIds);
       }
+    }
+
+    for (final tagId in addedTagIds) {
+      _updateTagForTodo(tags, tagId, todo.id, true);
     }
 
     for (final tagId in removedTagIds) {
-      final tagIndex = tags.indexWhere((t) => t.id == tagId);
-      if (tagIndex >= 0) {
-        final tag = tags[tagIndex];
-        final updatedTodoIds = Set<String>.from(tag.todoIds)..remove(todo.id);
-        tags[tagIndex] = tag.copyWith(todoIds: updatedTodoIds);
-      }
+      _updateTagForTodo(tags, tagId, todo.id, false);
     }
 
     _tagStreamController.add(tags);
-    await _setValue(kTagsCollectionKey, json.encode(tags));
+    _todoStreamController.add(List.unmodifiable(todos));
 
-    _todoStreamController.add(todos);
-    await _setValue(kTodosCollectionKey, json.encode(todos));
+    await Future.wait([
+      _setValue(kTagsCollectionKey, json.encode(tags)),
+      _setValue(kTodosCollectionKey, json.encode(todos)),
+    ]);
   }
 
   @override

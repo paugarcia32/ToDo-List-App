@@ -111,6 +111,7 @@ class TagChips extends StatelessWidget {
     return BlocSelector<TagsBloc, TagsState, Map<String, String>>(
       selector: (state) => state.tagIdToTitleMap,
       builder: (context, tagIdToTitleMap) {
+        if (tagIdToTitleMap.isEmpty) return CircularProgressIndicator();
         final tagTitles = tagIds.map((id) => tagIdToTitleMap[id] ?? 'Desconocido').toList();
 
         return Wrap(

@@ -23,12 +23,13 @@ class TagsBloc extends Bloc<TagsEvent, TagsState> {
     Emitter<TagsState> emit,
   ) async {
     emit(state.copyWith(status: TagsStatus.loading));
-
+    await Future.delayed(Duration(seconds: 10));
     try {
       await emit.forEach<List<Tag>>(
         _todosRepository.getTags(),
         onData: (tags) {
           final tagIdToTitleMap = {for (var tag in tags) tag.id: tag.title};
+
           return state.copyWith(
             status: TagsStatus.success,
             tags: tags,

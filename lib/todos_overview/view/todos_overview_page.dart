@@ -31,8 +31,21 @@ class TodosOverviewPage extends StatelessWidget {
   }
 }
 
-class TodosOverviewView extends StatelessWidget {
+class TodosOverviewView extends StatefulWidget {
   const TodosOverviewView({super.key});
+
+  @override
+  State<TodosOverviewView> createState() => _TodosOverviewViewState();
+}
+
+class _TodosOverviewViewState extends State<TodosOverviewView> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,79 +92,79 @@ class TodosOverviewView extends StatelessWidget {
         ],
         child: BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
           builder: (context, todosState) {
-            return BlocBuilder<TagsBloc, TagsState>(builder: (context, tagsState) {
-              if (todosState.status == TodosOverviewStatus.loading || tagsState.status == TagsStatus.loading) {
-                return const Center(child: CupertinoActivityIndicator());
-              }
+            if (todosState.status == TodosOverviewStatus.loading) {
+              return const Center(child: CupertinoActivityIndicator());
+            }
 
-              if (todosState.status == TodosOverviewStatus.failure || tagsState.status == TagsStatus.failure) {
-                return Center(
-                  child: Text(
-                    l10n.todosOverviewErrorSnackbarText,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                );
-              }
-
-              if (todosState.todos.isEmpty) {
-                return Center(
-                  child: Text(
-                    l10n.todosOverviewEmptyText,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                );
-              }
-
-              return CupertinoScrollbar(
-                child: ListView.builder(
-                  itemCount: todosState.filteredTodos.length,
-                  itemBuilder: (_, index) {
-                    final todo = todosState.filteredTodos.elementAt(index);
-
-                    return TodoListTile(
-                      todo: todo,
-                      isLast: index == todosState.filteredTodos.length - 1,
-                      onToggleCompleted: (isCompleted) {
-                        context.read<TodosOverviewBloc>().add(
-                              TodosOverviewTodoCompletionToggled(
-                                todo: todo,
-                                isCompleted: isCompleted,
-                              ),
-                            );
-                      },
-                      onDismissed: (_) {
-                        context.read<TodosOverviewBloc>().add(TodosOverviewTodoDeleted(todo));
-                      },
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                          ),
-                          builder: (bottomSheetContext) {
-                            return BlocProvider(
-                              create: (context) => EditTodoBloc(
-                                todosRepository: context.read<TodosRepository>(),
-                                initialTodo: todo,
-                              ),
-                              child: BlocListener<EditTodoBloc, EditTodoState>(
-                                listenWhen: (previous, current) =>
-                                    previous.status != current.status && current.status == EditTodoStatus.success,
-                                listener: (context, state) {
-                                  Navigator.of(bottomSheetContext).pop();
-                                },
-                                child: const EditTodoView(),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
+            if (todosState.status == TodosOverviewStatus.failure) {
+              return Center(
+                child: Text(
+                  l10n.todosOverviewErrorSnackbarText,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               );
-            });
+            }
+
+            if (todosState.todos.isEmpty) {
+              return Center(
+                child: Text(
+                  l10n.todosOverviewEmptyText,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              );
+            }
+
+            return CupertinoScrollbar(
+              controller: _scrollController,
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: todosState.filteredTodos.length,
+                itemBuilder: (_, index) {
+                  final todo = todosState.filteredTodos.elementAt(index);
+
+                  return TodoListTile(
+                    todo: todo,
+                    isLast: index == todosState.filteredTodos.length - 1,
+                    onToggleCompleted: (isCompleted) {
+                      context.read<TodosOverviewBloc>().add(
+                            TodosOverviewTodoCompletionToggled(
+                              todo: todo,
+                              isCompleted: isCompleted,
+                            ),
+                          );
+                    },
+                    onDismissed: (_) {
+                      context.read<TodosOverviewBloc>().add(TodosOverviewTodoDeleted(todo));
+                    },
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        builder: (bottomSheetContext) {
+                          return BlocProvider(
+                            create: (context) => EditTodoBloc(
+                              todosRepository: context.read<TodosRepository>(),
+                              initialTodo: todo,
+                            ),
+                            child: BlocListener<EditTodoBloc, EditTodoState>(
+                              listenWhen: (previous, current) =>
+                                  previous.status != current.status && current.status == EditTodoStatus.success,
+                              listener: (context, state) {
+                                Navigator.of(bottomSheetContext).pop();
+                              },
+                              child: const EditTodoView(),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+            );
           },
         ),
       ),
