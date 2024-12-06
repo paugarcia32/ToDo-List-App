@@ -26,10 +26,11 @@ class TagCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.tag,
                   size: 20,
-                  color: Colors.purple,
+                  // color: Colors.purple,
+                  color: Color(int.parse(tag.color.substring(1), radix: 16) | 0xFF000000),
                 ),
                 const SizedBox(width: 8),
                 Expanded(

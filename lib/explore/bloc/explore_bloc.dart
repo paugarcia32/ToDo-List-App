@@ -15,6 +15,11 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   ExploreBloc({required this.todosRepository}) : super(const ExploreState()) {
     on<TagsSubscriptionRequested>(_onTagsSubscriptionRequested);
     on<TagDeleted>(_onTagDeleted);
+    on<TagAdded>(_onTagAdded);
+    on<TagEdited>(_onTagEditted);
+    on<AddTagName>(_onNameTagAdded);
+    on<AddTagSubmitted>(_onSubmitted);
+    on<AddTagColor>(_onColorTagAdded);
   }
 
   Future<void> _onTagsSubscriptionRequested(
@@ -42,6 +47,63 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
     } catch (e) {
       emit(state.copyWith(status: ExploreStatus.failure));
     }
+  }
+
+  Future<void> _onTagAdded(
+    TagAdded event,
+    Emitter<ExploreState> emit,
+  ) async {
+    try {
+      await todosRepository.saveTag(event.addedTag);
+    } catch (e) {
+      emit(state.copyWith(status: ExploreStatus.failure));
+    }
+  }
+
+  Future<void> _onTagEditted(
+    TagEdited event,
+    Emitter<ExploreState> emit,
+  ) async {
+    try {} catch (e) {
+      emit(state.copyWith(status: ExploreStatus.failure));
+    }
+  }
+
+  Future<void> _onNameTagAdded(
+    AddTagName event,
+    Emitter<ExploreState> emit,
+  ) async {
+    emit(state.copyWith(title: event.tagName));
+  }
+
+  Future<void> _onSubmitted(
+    AddTagSubmitted event,
+    Emitter<ExploreState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(status: ExploreStatus.loading));
+
+      final newTag = Tag(
+        title: state.title,
+        color: state.color,
+      );
+      await todosRepository.saveTag(newTag);
+
+      emit(state.copyWith(
+        status: ExploreStatus.success,
+        title: "",
+        color: "#FFFFFF",
+      ));
+    } catch (e) {
+      emit(state.copyWith(status: ExploreStatus.failure));
+    }
+  }
+
+  Future<void> _onColorTagAdded(
+    AddTagColor event,
+    Emitter<ExploreState> emit,
+  ) async {
+    emit(state.copyWith(color: event.tagColor));
   }
 
   @override

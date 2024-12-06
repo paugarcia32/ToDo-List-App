@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/explore/bloc/explore_bloc.dart';
+import 'package:todo_app/explore/widgets/addTagModal.dart';
 import 'package:todo_app/explore/widgets/tag_list_tile.dart';
 import 'package:todo_app/l10n/l10n.dart';
 import 'package:todos_repository/todos_repository.dart';
@@ -37,12 +38,38 @@ class ExploreView extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Tags',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Tags',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        builder: (bottomSheetContext) {
+                          // Aquí obtenemos el ExploreBloc a partir del contexto principal
+                          final exploreBloc = context.read<ExploreBloc>();
+
+                          return BlocProvider.value(
+                            value: exploreBloc,
+                            child: const AddTagModal(),
+                          );
+                        },
+                      );
+                    },
+                    child: const Icon(Icons.add),
+                  ),
+                ],
               ),
             ),
             const Divider(),
