@@ -9,10 +9,18 @@ part 'explore_event.dart';
 part 'explore_state.dart';
 
 class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
-  final TodosRepository todosRepository;
+  final TodosRepository _todosRepository;
   StreamSubscription<List<Tag>>? _tagsSubscription;
 
-  ExploreBloc({required this.todosRepository}) : super(const ExploreState()) {
+  ExploreBloc({
+    required TodosRepository todosRepository,
+    required Tag? initialTag,
+  })  : _todosRepository = todosRepository,
+        super(ExploreState(
+          initialTag: initialTag,
+          title: initialTag?.title ?? "",
+          color: initialTag?.color ?? "#FFFFFFFF",
+        )) {
     on<TagsSubscriptionRequested>(_onTagsSubscriptionRequested);
     on<TagDeleted>(_onTagDeleted);
     on<TagAdded>(_onTagAdded);
@@ -29,7 +37,7 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
     emit(state.copyWith(status: ExploreStatus.loading));
 
     await emit.forEach<List<Tag>>(
-      todosRepository.getTags(),
+      _todosRepository.getTags(),
       onData: (tagsList) => state.copyWith(
         status: ExploreStatus.success,
         tags: tagsList.toSet(),
@@ -43,7 +51,7 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
     Emitter<ExploreState> emit,
   ) async {
     try {
-      await todosRepository.deleteTag(event.tagId);
+      await _todosRepository.deleteTag(event.tagId);
     } catch (e) {
       emit(state.copyWith(status: ExploreStatus.failure));
     }
@@ -54,7 +62,7 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
     Emitter<ExploreState> emit,
   ) async {
     try {
-      await todosRepository.saveTag(event.addedTag);
+      await _todosRepository.saveTag(event.addedTag);
     } catch (e) {
       emit(state.copyWith(status: ExploreStatus.failure));
     }
@@ -83,16 +91,25 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
     try {
       emit(state.copyWith(status: ExploreStatus.loading));
 
-      final newTag = Tag(
-        title: state.title,
-        color: state.color,
-      );
-      await todosRepository.saveTag(newTag);
+      if (state.initialTag != null) {
+        final updatedTag = state.initialTag!.copyWith(
+          title: state.title,
+          color: state.color,
+        );
+        await _todosRepository.saveTag(updatedTag);
+      } else {
+        final newTag = Tag(
+          title: state.title,
+          color: state.color,
+        );
+        await _todosRepository.saveTag(newTag);
+      }
 
       emit(state.copyWith(
         status: ExploreStatus.success,
         title: "",
-        color: "#FFFFFF",
+        color: "#FFFFFFFF",
+        initialTag: null,
       ));
     } catch (e) {
       emit(state.copyWith(status: ExploreStatus.failure));

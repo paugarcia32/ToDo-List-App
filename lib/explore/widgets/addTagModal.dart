@@ -75,9 +75,15 @@ class _NameField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final l10n = context.l10n;
+    final state = context.watch<ExploreBloc>().state;
+    final hintText = state.initialTag?.title ?? '';
+
     return TextFormField(
-      decoration: const InputDecoration(
+      initialValue: state.title,
+      decoration: InputDecoration(
         labelText: "Tag Title",
+        hintText: hintText,
       ),
       inputFormatters: [
         LengthLimitingTextInputFormatter(100),
@@ -101,10 +107,12 @@ class _ColorDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<ExploreBloc>().state;
     final colorEntries = FlutterTodosTheme.predefinedColorMap.entries.toList();
 
     return DropdownButton<String>(
-      value: selectedColorHex,
+      // value: selectedColorHex,
+      value: state.color,
       icon: const Icon(Icons.arrow_downward),
       iconSize: 24,
       elevation: 16,

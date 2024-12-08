@@ -14,6 +14,7 @@ class ExplorePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => ExploreBloc(
         todosRepository: context.read<TodosRepository>(),
+        initialTag: null,
       )..add(const TagsSubscriptionRequested()),
       child: const ExploreView(),
     );
@@ -57,7 +58,6 @@ class ExploreView extends StatelessWidget {
                           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                         ),
                         builder: (bottomSheetContext) {
-                          // Aquí obtenemos el ExploreBloc a partir del contexto principal
                           final exploreBloc = context.read<ExploreBloc>();
 
                           return BlocProvider.value(
@@ -95,8 +95,24 @@ class ExploreView extends StatelessWidget {
                           return TagListTile(
                             tag: tag,
                             onTap: () {},
-                            onDelete: () {
-                              context.read<ExploreBloc>().add(TagDeleted(tag.id));
+                            onDelete: () {},
+                            onEdit: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                ),
+                                builder: (bottomSheetContext) {
+                                  return BlocProvider(
+                                    create: (context) => ExploreBloc(
+                                      todosRepository: context.read<TodosRepository>(),
+                                      initialTag: tag,
+                                    ),
+                                    child: const AddTagModal(),
+                                  );
+                                },
+                              );
                             },
                           );
                         },

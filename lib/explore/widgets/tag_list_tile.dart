@@ -7,12 +7,14 @@ class TagListTile extends StatelessWidget {
     required this.tag,
     this.onTap,
     this.onDelete,
+    this.onEdit,
     super.key,
   });
 
   final Tag tag;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,7 @@ class TagListTile extends StatelessWidget {
         tag: tag,
         onTap: onTap,
         onDelete: onDelete,
+        onEdit: onEdit,
       ),
     );
   }

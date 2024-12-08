@@ -9,6 +9,7 @@ final class ExploreState extends Equatable {
     this.numOfTodos = 0,
     this.title = "",
     this.color = "#FFFFFF",
+    this.initialTag,
   });
 
   final ExploreStatus status;
@@ -16,15 +17,9 @@ final class ExploreState extends Equatable {
   final int numOfTodos;
   final String title;
   final String color;
+  final Tag? initialTag;
 
-  @override
-  List<Object> get props => [
-        status,
-        tags,
-        numOfTodos,
-        title,
-        color,
-      ];
+  bool get isNewTodo => initialTag == null;
 
   ExploreState copyWith({
     ExploreStatus? status,
@@ -32,6 +27,7 @@ final class ExploreState extends Equatable {
     int? numOfTodos,
     String? title,
     String? color,
+    Tag? initialTag,
   }) {
     return ExploreState(
       status: status ?? this.status,
@@ -39,6 +35,17 @@ final class ExploreState extends Equatable {
       numOfTodos: numOfTodos ?? this.numOfTodos,
       title: title ?? this.title,
       color: color ?? this.color,
+      initialTag: initialTag ?? this.initialTag,
     );
   }
+
+  @override
+  List<Object?> get props => [
+        status,
+        tags,
+        numOfTodos,
+        title,
+        color,
+        initialTag,
+      ];
 }

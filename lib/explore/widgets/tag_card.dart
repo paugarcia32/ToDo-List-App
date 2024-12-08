@@ -6,12 +6,14 @@ class TagCard extends StatelessWidget {
     required this.tag,
     this.onTap,
     this.onDelete,
+    this.onEdit,
     super.key,
   });
 
   final Tag tag;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,6 @@ class TagCard extends StatelessWidget {
                 Icon(
                   Icons.tag,
                   size: 20,
-                  // color: Colors.purple,
                   color: Color(int.parse(tag.color.substring(1), radix: 16) | 0xFF000000),
                 ),
                 const SizedBox(width: 8),
@@ -40,8 +41,8 @@ class TagCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: onDelete,
+                  icon: const Icon(Icons.edit),
+                  onPressed: onEdit,
                   iconSize: 18,
                 ),
               ],
