@@ -95,7 +95,9 @@ class ExploreView extends StatelessWidget {
                           return TagListTile(
                             tag: tag,
                             onTap: () {},
-                            onDelete: () {},
+                            onDelete: () {
+                              context.read<ExploreBloc>().add(TagDeleted(tag.id));
+                            },
                             onEdit: () {
                               showModalBottomSheet(
                                 context: context,
