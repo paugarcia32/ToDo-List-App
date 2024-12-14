@@ -31,34 +31,34 @@ class HomeView extends StatelessWidget {
         index: selectedTab.index,
         children: const [TodosOverviewPage(), StatsPage(), ExplorePage()],
       ),
-      floatingActionButton: FloatingActionButton(
-        shape: const CircleBorder(),
-        key: const Key('homeView_addTodo_floatingActionButton'),
-        onPressed: () => showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          builder: (bottomSheetContext) {
-            return BlocProvider(
-              create: (context) => EditTodoBloc(
-                todosRepository: context.read<TodosRepository>(),
-                initialTodo: null,
-              ),
-              child: BlocListener<EditTodoBloc, EditTodoState>(
-                listenWhen: (previous, current) =>
-                    previous.status != current.status && current.status == EditTodoStatus.success,
-                listener: (context, state) {
-                  Navigator.of(bottomSheetContext).pop();
-                },
-                child: const EditTodoView(),
-              ),
-            );
-          },
-        ),
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   shape: const CircleBorder(),
+      //   key: const Key('homeView_addTodo_floatingActionButton'),
+      //   onPressed: () => showModalBottomSheet(
+      //     context: context,
+      //     isScrollControlled: true,
+      //     shape: const RoundedRectangleBorder(
+      //       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      //     ),
+      //     builder: (bottomSheetContext) {
+      //       return BlocProvider(
+      //         create: (context) => EditTodoBloc(
+      //           todosRepository: context.read<TodosRepository>(),
+      //           initialTodo: null,
+      //         ),
+      //         child: BlocListener<EditTodoBloc, EditTodoState>(
+      //           listenWhen: (previous, current) =>
+      //               previous.status != current.status && current.status == EditTodoStatus.success,
+      //           listener: (context, state) {
+      //             Navigator.of(bottomSheetContext).pop();
+      //           },
+      //           child: const EditTodoView(),
+      //         ),
+      //       );
+      //     },
+      //   ),
+      //   child: const Icon(Icons.add),
+      // ),
       bottomNavigationBar: NavigationBar(
         destinations: const [
           NavigationDestination(
