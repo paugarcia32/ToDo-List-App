@@ -75,20 +75,6 @@ class _TodosOverviewViewState extends State<TodosOverviewView> {
               }
             },
           ),
-          BlocListener<TodosOverviewBloc, TodosOverviewState>(
-            listenWhen: (previous, current) => previous.status != current.status,
-            listener: (context, state) {
-              if (state.status == TodosOverviewStatus.failure) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text('Error al cargar las etiquetas.'),
-                    ),
-                  );
-              }
-            },
-          ),
         ],
         child: BlocBuilder<TodosOverviewBloc, TodosOverviewState>(
           builder: (context, todosState) {
