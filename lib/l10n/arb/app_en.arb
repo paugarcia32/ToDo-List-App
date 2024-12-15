@@ -126,5 +126,8 @@
   "colorDarkGreen": "Dark Green",
   "colorLightGreen": "Light Green",
   "colorSkyBlue": "Sky Blue",
-  "colorDarkBlue": "Dark Blue"
+  "colorDarkBlue": "Dark Blue",
+  "editTodoDateLabel": "Due Date",
+  "editTodoSelectDateHint": "Select a date"
+
 }

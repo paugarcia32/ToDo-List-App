@@ -67,6 +67,8 @@ class EditTodoView extends StatelessWidget {
             const SizedBox(height: 16),
             const _DescriptionField(),
             const SizedBox(height: 16),
+            const _DateField(),
+            const SizedBox(height: 16),
             const _TagsField(),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -141,6 +143,58 @@ class _DescriptionField extends StatelessWidget {
       onChanged: (value) {
         context.read<EditTodoBloc>().add(EditTodoDescriptionChanged(value));
       },
+    );
+  }
+}
+
+class _DateField extends StatelessWidget {
+  const _DateField({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final state = context.watch<EditTodoBloc>().state;
+    final selectedDate = state.date;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.editTodoDateLabel,
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: state.status.isLoadingOrSuccess
+              ? null
+              : () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+
+                  if (pickedDate != null) {
+                    context.read<EditTodoBloc>().add(EditTodoDateChanged(pickedDate));
+                  }
+                },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              selectedDate != null
+                  ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
+                  : l10n.editTodoSelectDateHint, // Mensaje cuando no hay fecha seleccionada
+              style: TextStyle(
+                color: selectedDate != null ? Colors.black : Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

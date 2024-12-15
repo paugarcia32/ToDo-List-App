@@ -25,6 +25,15 @@ final class EditTodoDescriptionChanged extends EditTodoEvent {
   List<Object> get props => [description];
 }
 
+final class EditTodoDateChanged extends EditTodoEvent {
+  const EditTodoDateChanged(this.date);
+
+  final DateTime date;
+
+  @override
+  List<Object> get props => [date];
+}
+
 final class EditTodoTagsChanged extends EditTodoEvent {
   const EditTodoTagsChanged(this.tags);
 
