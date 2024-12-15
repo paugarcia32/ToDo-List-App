@@ -104,6 +104,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
       title: state.title,
       description: state.description,
       tagIds: state.selectedTags.map((tag) => tag.id).toSet(),
+      date: state.date,
     );
 
     try {

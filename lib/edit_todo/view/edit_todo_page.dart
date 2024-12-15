@@ -148,7 +148,7 @@ class _DescriptionField extends StatelessWidget {
 }
 
 class _DateField extends StatelessWidget {
-  const _DateField({super.key});
+  const _DateField();
 
   @override
   Widget build(BuildContext context) {
@@ -179,18 +179,19 @@ class _DateField extends StatelessWidget {
                   }
                 },
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 16,
+            ),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(4),
             ),
+            alignment: Alignment.centerLeft,
             child: Text(
               selectedDate != null
                   ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
-                  : l10n.editTodoSelectDateHint, // Mensaje cuando no hay fecha seleccionada
-              style: TextStyle(
-                color: selectedDate != null ? Colors.black : Colors.grey,
-              ),
+                  : l10n.editTodoSelectDateHint,
             ),
           ),
         ),
@@ -281,19 +282,6 @@ class _TagsFieldState extends State<_TagsField> {
       children: [
         const Text('Tags'),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: tags
-              .map(
-                (tag) => InputChip(
-                  label: Text(tag.title),
-                  onDeleted: () => _removeTag(tag),
-                ),
-              )
-              .toList(),
-        ),
-        const SizedBox(height: 8),
         Autocomplete<String>(
           optionsBuilder: (TextEditingValue textEditingValue) {
             if (textEditingValue.text.isEmpty) {
@@ -332,6 +320,19 @@ class _TagsFieldState extends State<_TagsField> {
               },
             );
           },
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: tags
+              .map(
+                (tag) => InputChip(
+                  label: Text(tag.title),
+                  onDeleted: () => _removeTag(tag),
+                ),
+              )
+              .toList(),
         ),
       ],
     );

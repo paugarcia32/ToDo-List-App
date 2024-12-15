@@ -78,11 +78,29 @@ class TodoCard extends StatelessWidget {
                             style: theme.textTheme.bodySmall,
                           ),
                         ),
-                      if (todo.tagIds.isNotEmpty)
+                      if (todo.tagIds.isNotEmpty || todo.date != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
-                          child: TagChips(
-                            tagIds: todo.tagIds,
+                          child: Row(
+                            children: [
+                              if (todo.tagIds.isNotEmpty)
+                                Expanded(
+                                  child: TagChips(
+                                    tagIds: todo.tagIds,
+                                  ),
+                                ),
+                              if (todo.date != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    _formatDate(todo.date!),
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontSize: 12,
+                                      color: captionColor,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                     ],
@@ -95,6 +113,12 @@ class TodoCard extends StatelessWidget {
         if (!isLast) const Divider(thickness: 0.5, indent: 16, endIndent: 16),
       ],
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
   }
 }
 
