@@ -112,5 +112,19 @@
   "statsActiveTodoCountLabel": "Active todos",
   "@statsActiveTodoCountLabel": {
     "description": "Label text shown in the active todos count section of the Stats Page"
-  }
+  },
+
+  "exploreTitle": "Explore Tags",
+  "initialStateMessage": "Please wait...",
+  "noTagsAvailable": "No tags available.",
+  "failureStateMessage": "Failed to load tags. Please try again.",
+
+  "colorWhite": "White",
+  "colorRed": "Red",
+  "colorOrange": "Orange",
+  "colorPurple": "Purple",
+  "colorDarkGreen": "Dark Green",
+  "colorLightGreen": "Light Green",
+  "colorSkyBlue": "Sky Blue",
+  "colorDarkBlue": "Dark Blue"
 }
