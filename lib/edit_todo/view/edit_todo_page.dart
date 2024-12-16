@@ -67,6 +67,8 @@ class EditTodoView extends StatelessWidget {
             const SizedBox(height: 16),
             const _DescriptionField(),
             const SizedBox(height: 16),
+            const _DateField(),
+            const SizedBox(height: 16),
             const _TagsField(),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -141,6 +143,59 @@ class _DescriptionField extends StatelessWidget {
       onChanged: (value) {
         context.read<EditTodoBloc>().add(EditTodoDescriptionChanged(value));
       },
+    );
+  }
+}
+
+class _DateField extends StatelessWidget {
+  const _DateField();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final state = context.watch<EditTodoBloc>().state;
+    final selectedDate = state.date;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.editTodoDateLabel,
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: state.status.isLoadingOrSuccess
+              ? null
+              : () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+
+                  if (pickedDate != null) {
+                    context.read<EditTodoBloc>().add(EditTodoDateChanged(pickedDate));
+                  }
+                },
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 16,
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              selectedDate != null
+                  ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
+                  : l10n.editTodoSelectDateHint,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -227,19 +282,6 @@ class _TagsFieldState extends State<_TagsField> {
       children: [
         const Text('Tags'),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: tags
-              .map(
-                (tag) => InputChip(
-                  label: Text(tag.title),
-                  onDeleted: () => _removeTag(tag),
-                ),
-              )
-              .toList(),
-        ),
-        const SizedBox(height: 8),
         Autocomplete<String>(
           optionsBuilder: (TextEditingValue textEditingValue) {
             if (textEditingValue.text.isEmpty) {
@@ -278,6 +320,19 @@ class _TagsFieldState extends State<_TagsField> {
               },
             );
           },
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: tags
+              .map(
+                (tag) => InputChip(
+                  label: Text(tag.title),
+                  onDeleted: () => _removeTag(tag),
+                ),
+              )
+              .toList(),
         ),
       ],
     );

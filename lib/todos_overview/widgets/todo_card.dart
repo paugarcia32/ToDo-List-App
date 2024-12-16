@@ -29,21 +29,16 @@ class TodoCard extends StatelessWidget {
         InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Checkbox(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(16)),
-                      ),
-                      value: todo.isCompleted,
-                      onChanged: onToggleCompleted == null ? null : (value) => onToggleCompleted!(value!),
-                    ),
-                  ],
+                Checkbox(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                  value: todo.isCompleted,
+                  onChanged: onToggleCompleted == null ? null : (value) => onToggleCompleted!(value!),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -51,6 +46,7 @@ class TodoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
                             child: Text(
@@ -78,11 +74,23 @@ class TodoCard extends StatelessWidget {
                             style: theme.textTheme.bodySmall,
                           ),
                         ),
-                      if (todo.tagIds.isNotEmpty)
+                      if (todo.tagIds.isNotEmpty || todo.date != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
-                          child: TagChips(
-                            tagIds: todo.tagIds,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: todo.tagIds.isNotEmpty ? TagChips(tagIds: todo.tagIds) : const SizedBox.shrink(),
+                              ),
+                              if (todo.date != null)
+                                Text(
+                                  _formatDate(todo.date!),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontSize: 12,
+                                    color: captionColor,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                     ],
@@ -95,6 +103,12 @@ class TodoCard extends StatelessWidget {
         if (!isLast) const Divider(thickness: 0.5, indent: 16, endIndent: 16),
       ],
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
   }
 }
 
@@ -111,18 +125,27 @@ class TagChips extends StatelessWidget {
     return BlocSelector<TagsBloc, TagsState, Map<String, String>>(
       selector: (state) => state.tagIdToTitleMap,
       builder: (context, tagIdToTitleMap) {
-        if (tagIdToTitleMap.isEmpty) return CircularProgressIndicator();
-        final tagTitles = tagIds.map((id) => tagIdToTitleMap[id] ?? 'Desconocido').toList();
+        final tagTitles = tagIds.map((id) => tagIdToTitleMap[id] ?? 'Unknown').toList();
 
         return Wrap(
           spacing: 4,
+          runSpacing: 4,
           children: tagTitles
               .map(
-                (tag) => Text(
-                  tag,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 12,
-                    color: captionColor,
+                (tag) => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    tag,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
+                      color: captionColor,
+                    ),
                   ),
                 ),
               )

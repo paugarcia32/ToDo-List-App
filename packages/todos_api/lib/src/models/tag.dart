@@ -13,7 +13,7 @@ class Tag extends Equatable {
     required this.title,
     String? id,
     this.isArchived = false,
-    this.color = '#FFFFFF',
+    this.color = '#FFFFFFFF',
     Set<String>? todoIds,
   })  : assert(title.isNotEmpty, 'Title cannot be empty'),
         id = id?.isNotEmpty == true ? id! : const Uuid().v4(),

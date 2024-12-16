@@ -16,6 +16,7 @@ class Todo extends Equatable {
     this.description = '',
     this.isCompleted = false,
     Set<String>? tagIds,
+    this.date,
   })  : assert(
           id == null || id.isNotEmpty,
           'id must either be null or not empty',
@@ -27,8 +28,8 @@ class Todo extends Equatable {
   final String title;
   final String description;
   final bool isCompleted;
-
   final Set<String> tagIds;
+  final DateTime? date;
 
   Todo copyWith({
     String? id,
@@ -36,6 +37,7 @@ class Todo extends Equatable {
     String? description,
     bool? isCompleted,
     Set<String>? tagIds,
+    DateTime? date,
   }) {
     return Todo(
       id: id ?? this.id,
@@ -43,6 +45,7 @@ class Todo extends Equatable {
       description: description ?? this.description,
       isCompleted: isCompleted ?? this.isCompleted,
       tagIds: tagIds ?? this.tagIds,
+      date: date ?? this.date,
     );
   }
 
@@ -51,5 +54,5 @@ class Todo extends Equatable {
   JsonMap toJson() => _$TodoToJson(this);
 
   @override
-  List<Object?> get props => [id, title, description, isCompleted, tagIds];
+  List<Object?> get props => [id, title, description, isCompleted, tagIds, date];
 }

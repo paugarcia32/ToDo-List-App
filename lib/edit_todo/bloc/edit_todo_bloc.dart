@@ -25,6 +25,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     on<EditTodoTagsChanged>(_onTagsChanged);
     on<EditTodoLoadTags>(_onLoadTags);
     on<EditTodoSubmitted>(_onSubmitted);
+    on<EditTodoDateChanged>(_onDateChanged);
 
     add(const EditTodoLoadTags());
   }
@@ -43,6 +44,13 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     Emitter<EditTodoState> emit,
   ) {
     emit(state.copyWith(description: event.description));
+  }
+
+  void _onDateChanged(
+    EditTodoDateChanged event,
+    Emitter<EditTodoState> emit,
+  ) {
+    emit(state.copyWith(date: event.date));
   }
 
   void _onTagToggled(
@@ -96,6 +104,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
       title: state.title,
       description: state.description,
       tagIds: state.selectedTags.map((tag) => tag.id).toSet(),
+      date: state.date,
     );
 
     try {

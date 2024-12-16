@@ -8,7 +8,7 @@ final class ExploreState extends Equatable {
     this.tags = const <Tag>{},
     this.numOfTodos = 0,
     this.title = "",
-    this.color = "#FFFFFF",
+    this.color = "#FFFFFFFF",
     this.initialTag,
   });
 

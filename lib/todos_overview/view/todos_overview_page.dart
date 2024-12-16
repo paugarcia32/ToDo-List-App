@@ -75,14 +75,14 @@ class _TodosOverviewViewState extends State<TodosOverviewView> {
               }
             },
           ),
-          BlocListener<TodosOverviewBloc, TodosOverviewState>(
+          BlocListener<TagsBloc, TagsState>(
             listenWhen: (previous, current) => previous.status != current.status,
             listener: (context, state) {
-              if (state.status == TodosOverviewStatus.failure) {
+              if (state.status == TagsStatus.failure) {
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Error al cargar las etiquetas.'),
                     ),
                   );
