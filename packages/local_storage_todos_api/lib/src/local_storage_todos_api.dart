@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:local_storage_todos_api/src/sync_utils.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,46 +65,12 @@ class LocalStorageTodosApi extends TodosApi {
   @override
   Stream<List<Todo>> getTodos() => _todoStreamController.asBroadcastStream();
 
-  /// Update the `tags` list adding or removing `todoId` in each Tag
-  List<Tag> syncTagsFromTodo({
-    required List<Tag> tags,
-    required String todoId,
-    required Set<String> addedTagIds,
-    required Set<String> removedTagIds,
-  }) {
-    final updatedTags = List<Tag>.from(tags);
-
-    void _updateTagForTodo(String tagId, bool add) {
-      final tagIndex = updatedTags.indexWhere((t) => t.id == tagId);
-      if (tagIndex >= 0) {
-        final tag = updatedTags[tagIndex];
-        final updatedTodoIds = Set<String>.from(tag.todoIds);
-        if (add) {
-          updatedTodoIds.add(todoId);
-        } else {
-          updatedTodoIds.remove(todoId);
-        }
-        updatedTags[tagIndex] = tag.copyWith(todoIds: updatedTodoIds);
-      }
-    }
-
-    // Añadimos
-    for (final tagId in addedTagIds) {
-      _updateTagForTodo(tagId, true);
-    }
-    // Quitamos
-    for (final tagId in removedTagIds) {
-      _updateTagForTodo(tagId, false);
-    }
-
-    return updatedTags;
-  }
-
   @override
   Future<void> saveTodo(Todo todo) async {
     final currentTodos = List<Todo>.from(_todoStreamController.value);
     final currentTags = List<Tag>.from(_tagStreamController.value);
 
+    // 1. Localizamos el viejo Todo (para saber oldTagIds)
     final todoIndex = currentTodos.indexWhere((t) => t.id == todo.id);
     final oldTagIds = (todoIndex >= 0) ? currentTodos[todoIndex].tagIds : <String>{};
 
@@ -113,11 +80,11 @@ class LocalStorageTodosApi extends TodosApi {
       currentTodos.add(todo);
     }
 
-    final diff = diffIds(oldTagIds, todo.tagIds);
+    final diff = SyncUtils.diffIds(oldTagIds, todo.tagIds);
     final addedTagIds = diff['added']!;
     final removedTagIds = diff['removed']!;
 
-    final updatedTags = syncTagsFromTodo(
+    final updatedTags = SyncUtils.syncTagsFromTodo(
       tags: currentTags,
       todoId: todo.id,
       addedTagIds: addedTagIds,
@@ -249,41 +216,6 @@ class LocalStorageTodosApi extends TodosApi {
     return todos.where((todo) => todo.tagIds.contains(tagId)).toList();
   }
 
-  /// Update the `todos` list adding or removing `tagId` in each Todo
-  List<Todo> syncTodosFromTag({
-    required List<Todo> todos,
-    required String tagId,
-    required Set<String> addedTodoIds,
-    required Set<String> removedTodoIds,
-  }) {
-    final updatedTodos = List<Todo>.from(todos);
-
-    void _updateTodoForTag(String todoId, bool add) {
-      final todoIndex = updatedTodos.indexWhere((t) => t.id == todoId);
-      if (todoIndex >= 0) {
-        final todo = updatedTodos[todoIndex];
-        final updatedTagIds = Set<String>.from(todo.tagIds);
-        if (add) {
-          updatedTagIds.add(tagId);
-        } else {
-          updatedTagIds.remove(tagId);
-        }
-        updatedTodos[todoIndex] = todo.copyWith(tagIds: updatedTagIds);
-      }
-    }
-
-    // Añadimos
-    for (final todoId in addedTodoIds) {
-      _updateTodoForTag(todoId, true);
-    }
-    // Quitamos
-    for (final todoId in removedTodoIds) {
-      _updateTodoForTag(todoId, false);
-    }
-
-    return updatedTodos;
-  }
-
   @override
   Future<void> saveTag(Tag tag) async {
     final currentTags = List<Tag>.from(_tagStreamController.value);
@@ -298,11 +230,11 @@ class LocalStorageTodosApi extends TodosApi {
       currentTags.add(tag);
     }
 
-    final diff = diffIds(oldTodoIds, tag.todoIds);
+    final diff = SyncUtils.diffIds(oldTodoIds, tag.todoIds);
     final addedTodoIds = diff['added']!;
     final removedTodoIds = diff['removed']!;
 
-    final updatedTodos = syncTodosFromTag(
+    final updatedTodos = SyncUtils.syncTodosFromTag(
       todos: currentTodos,
       tagId: tag.id,
       addedTodoIds: addedTodoIds,
