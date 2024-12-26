@@ -14,20 +14,19 @@ void main() {
       id: '1',
       title: 'title 1',
       description: 'description 1',
-      tags: ['work', 'urgent'],
+      tagIds: {'1', '2'},
+      // date: ,
     ),
     Todo(
       id: '2',
       title: 'title 2',
       description: 'description 2',
-      tags: ['personal', 'later'],
     ),
     Todo(
       id: '3',
       title: 'title 3',
       description: 'description 3',
       isCompleted: true,
-      tags: ['shopping', 'important', 'Prueba'],
     ),
   ];
 

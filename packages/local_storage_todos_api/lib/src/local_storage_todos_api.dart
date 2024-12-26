@@ -227,18 +227,58 @@ class LocalStorageTodosApi extends TodosApi {
 
   @override
   Future<void> saveTag(Tag tag) async {
-    final tags = [..._tagStreamController.value];
+    final tags = List<Tag>.from(_tagStreamController.value);
+
     final tagIndex = tags.indexWhere((t) => t.id == tag.id);
 
+    Tag? oldTag;
     if (tagIndex >= 0) {
+      oldTag = tags[tagIndex];
       tags[tagIndex] = tag;
     } else {
+      oldTag = null;
       tags.add(tag);
     }
 
-    _tagStreamController.add(tags);
+    final oldTodoIds = oldTag?.todoIds ?? {};
+    final newTodoIds = tag.todoIds;
 
-    await _setValue(kTagsCollectionKey, json.encode(tags));
+    final addedTodoIds = newTodoIds.difference(oldTodoIds);
+    final removedTodoIds = oldTodoIds.difference(newTodoIds);
+
+    final todos = List<Todo>.from(_todoStreamController.value);
+
+    void _updateTodoForTag(List<Todo> todos, String todoId, String tagId, bool add) {
+      final todoIndex = todos.indexWhere((t) => t.id == todoId);
+      if (todoIndex >= 0) {
+        final todo = todos[todoIndex];
+        final updatedTagIds = Set<String>.from(todo.tagIds);
+
+        if (add) {
+          updatedTagIds.add(tagId);
+        } else {
+          updatedTagIds.remove(tagId);
+        }
+
+        todos[todoIndex] = todo.copyWith(tagIds: updatedTagIds);
+      }
+    }
+
+    for (final todoId in addedTodoIds) {
+      _updateTodoForTag(todos, todoId, tag.id, true);
+    }
+
+    for (final todoId in removedTodoIds) {
+      _updateTodoForTag(todos, todoId, tag.id, false);
+    }
+
+    _tagStreamController.add(List.unmodifiable(tags));
+    _todoStreamController.add(List.unmodifiable(todos));
+
+    await Future.wait([
+      _setValue(kTagsCollectionKey, json.encode(tags)),
+      _setValue(kTodosCollectionKey, json.encode(todos)),
+    ]);
   }
 
   @override
