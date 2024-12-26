@@ -30,6 +30,15 @@ class LocalStorageTodosApi extends TodosApi {
   String? _getValue(String key) => _plugin.getString(key);
   Future<void> _setValue(String key, String value) => _plugin.setString(key, value);
 
+  Map<String, Set<String>> diffIds(Set<String> oldIds, Set<String> newIds) {
+    final added = newIds.difference(oldIds);
+    final removed = oldIds.difference(newIds);
+    return {
+      'added': added,
+      'removed': removed,
+    };
+  }
+
   void _init() {
     final todosJson = _getValue(kTodosCollectionKey);
     if (todosJson != null) {
@@ -55,57 +64,72 @@ class LocalStorageTodosApi extends TodosApi {
   @override
   Stream<List<Todo>> getTodos() => _todoStreamController.asBroadcastStream();
 
-  @override
-  Future<void> saveTodo(Todo todo) async {
-    final todos = List<Todo>.from(_todoStreamController.value);
-    final todoIndex = todos.indexWhere((t) => t.id == todo.id);
+  /// Update the `tags` list adding or removing `todoId` in each Tag
+  List<Tag> syncTagsFromTodo({
+    required List<Tag> tags,
+    required String todoId,
+    required Set<String> addedTagIds,
+    required Set<String> removedTagIds,
+  }) {
+    final updatedTags = List<Tag>.from(tags);
 
-    Set<String> oldTagIds = {};
-
-    if (todoIndex >= 0) {
-      final oldTodo = todos[todoIndex];
-      oldTagIds = oldTodo.tagIds;
-      todos[todoIndex] = todo;
-    } else {
-      oldTagIds = {};
-      todos.add(todo);
-    }
-
-    final newTagIds = todo.tagIds;
-
-    final addedTagIds = newTagIds.difference(oldTagIds);
-    final removedTagIds = oldTagIds.difference(newTagIds);
-
-    final tags = List<Tag>.from(_tagStreamController.value);
-
-    void _updateTagForTodo(List<Tag> tags, String tagId, String todoId, bool add) {
-      final tagIndex = tags.indexWhere((t) => t.id == tagId);
+    void _updateTagForTodo(String tagId, bool add) {
+      final tagIndex = updatedTags.indexWhere((t) => t.id == tagId);
       if (tagIndex >= 0) {
-        final tag = tags[tagIndex];
+        final tag = updatedTags[tagIndex];
         final updatedTodoIds = Set<String>.from(tag.todoIds);
         if (add) {
           updatedTodoIds.add(todoId);
         } else {
           updatedTodoIds.remove(todoId);
         }
-        tags[tagIndex] = tag.copyWith(todoIds: updatedTodoIds);
+        updatedTags[tagIndex] = tag.copyWith(todoIds: updatedTodoIds);
       }
     }
 
+    // Añadimos
     for (final tagId in addedTagIds) {
-      _updateTagForTodo(tags, tagId, todo.id, true);
+      _updateTagForTodo(tagId, true);
     }
-
+    // Quitamos
     for (final tagId in removedTagIds) {
-      _updateTagForTodo(tags, tagId, todo.id, false);
+      _updateTagForTodo(tagId, false);
     }
 
-    _tagStreamController.add(tags);
-    _todoStreamController.add(List.unmodifiable(todos));
+    return updatedTags;
+  }
+
+  @override
+  Future<void> saveTodo(Todo todo) async {
+    final currentTodos = List<Todo>.from(_todoStreamController.value);
+    final currentTags = List<Tag>.from(_tagStreamController.value);
+
+    final todoIndex = currentTodos.indexWhere((t) => t.id == todo.id);
+    final oldTagIds = (todoIndex >= 0) ? currentTodos[todoIndex].tagIds : <String>{};
+
+    if (todoIndex >= 0) {
+      currentTodos[todoIndex] = todo;
+    } else {
+      currentTodos.add(todo);
+    }
+
+    final diff = diffIds(oldTagIds, todo.tagIds);
+    final addedTagIds = diff['added']!;
+    final removedTagIds = diff['removed']!;
+
+    final updatedTags = syncTagsFromTodo(
+      tags: currentTags,
+      todoId: todo.id,
+      addedTagIds: addedTagIds,
+      removedTagIds: removedTagIds,
+    );
+
+    _todoStreamController.add(List.unmodifiable(currentTodos));
+    _tagStreamController.add(List.unmodifiable(updatedTags));
 
     await Future.wait([
-      _setValue(kTagsCollectionKey, json.encode(tags)),
-      _setValue(kTodosCollectionKey, json.encode(todos)),
+      _setValue(kTodosCollectionKey, json.encode(currentTodos)),
+      _setValue(kTagsCollectionKey, json.encode(updatedTags)),
     ]);
   }
 
@@ -225,59 +249,72 @@ class LocalStorageTodosApi extends TodosApi {
     return todos.where((todo) => todo.tagIds.contains(tagId)).toList();
   }
 
-  @override
-  Future<void> saveTag(Tag tag) async {
-    final tags = List<Tag>.from(_tagStreamController.value);
+  /// Update the `todos` list adding or removing `tagId` in each Todo
+  List<Todo> syncTodosFromTag({
+    required List<Todo> todos,
+    required String tagId,
+    required Set<String> addedTodoIds,
+    required Set<String> removedTodoIds,
+  }) {
+    final updatedTodos = List<Todo>.from(todos);
 
-    final tagIndex = tags.indexWhere((t) => t.id == tag.id);
-
-    Tag? oldTag;
-    if (tagIndex >= 0) {
-      oldTag = tags[tagIndex];
-      tags[tagIndex] = tag;
-    } else {
-      oldTag = null;
-      tags.add(tag);
-    }
-
-    final oldTodoIds = oldTag?.todoIds ?? {};
-    final newTodoIds = tag.todoIds;
-
-    final addedTodoIds = newTodoIds.difference(oldTodoIds);
-    final removedTodoIds = oldTodoIds.difference(newTodoIds);
-
-    final todos = List<Todo>.from(_todoStreamController.value);
-
-    void _updateTodoForTag(List<Todo> todos, String todoId, String tagId, bool add) {
-      final todoIndex = todos.indexWhere((t) => t.id == todoId);
+    void _updateTodoForTag(String todoId, bool add) {
+      final todoIndex = updatedTodos.indexWhere((t) => t.id == todoId);
       if (todoIndex >= 0) {
-        final todo = todos[todoIndex];
+        final todo = updatedTodos[todoIndex];
         final updatedTagIds = Set<String>.from(todo.tagIds);
-
         if (add) {
           updatedTagIds.add(tagId);
         } else {
           updatedTagIds.remove(tagId);
         }
-
-        todos[todoIndex] = todo.copyWith(tagIds: updatedTagIds);
+        updatedTodos[todoIndex] = todo.copyWith(tagIds: updatedTagIds);
       }
     }
 
+    // Añadimos
     for (final todoId in addedTodoIds) {
-      _updateTodoForTag(todos, todoId, tag.id, true);
+      _updateTodoForTag(todoId, true);
     }
-
+    // Quitamos
     for (final todoId in removedTodoIds) {
-      _updateTodoForTag(todos, todoId, tag.id, false);
+      _updateTodoForTag(todoId, false);
     }
 
-    _tagStreamController.add(List.unmodifiable(tags));
-    _todoStreamController.add(List.unmodifiable(todos));
+    return updatedTodos;
+  }
+
+  @override
+  Future<void> saveTag(Tag tag) async {
+    final currentTags = List<Tag>.from(_tagStreamController.value);
+    final currentTodos = List<Todo>.from(_todoStreamController.value);
+
+    final tagIndex = currentTags.indexWhere((t) => t.id == tag.id);
+    final oldTodoIds = (tagIndex >= 0) ? currentTags[tagIndex].todoIds : <String>{};
+
+    if (tagIndex >= 0) {
+      currentTags[tagIndex] = tag;
+    } else {
+      currentTags.add(tag);
+    }
+
+    final diff = diffIds(oldTodoIds, tag.todoIds);
+    final addedTodoIds = diff['added']!;
+    final removedTodoIds = diff['removed']!;
+
+    final updatedTodos = syncTodosFromTag(
+      todos: currentTodos,
+      tagId: tag.id,
+      addedTodoIds: addedTodoIds,
+      removedTodoIds: removedTodoIds,
+    );
+
+    _tagStreamController.add(List.unmodifiable(currentTags));
+    _todoStreamController.add(List.unmodifiable(updatedTodos));
 
     await Future.wait([
-      _setValue(kTagsCollectionKey, json.encode(tags)),
-      _setValue(kTodosCollectionKey, json.encode(todos)),
+      _setValue(kTagsCollectionKey, json.encode(currentTags)),
+      _setValue(kTodosCollectionKey, json.encode(updatedTodos)),
     ]);
   }
 
