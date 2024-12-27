@@ -15,18 +15,20 @@ void main() {
       title: 'title 1',
       description: 'description 1',
       tagIds: {'1', '2'},
-      // date: ,
+      date: DateTime.now(),
     ),
     Todo(
       id: '2',
       title: 'title 2',
       description: 'description 2',
+      tagIds: {'3'},
     ),
     Todo(
       id: '3',
       title: 'title 3',
       description: 'description 3',
       isCompleted: true,
+      tagIds: {'4'},
     ),
   ];
 
@@ -114,7 +116,7 @@ void main() {
         verify: (_) {
           final expectedTodo = mockTodos.first.copyWith(isCompleted: true);
           verify(() => todosRepository.saveTodo(expectedTodo)).called(1);
-          expect(expectedTodo.tags, equals(mockTodos.first.tags));
+          expect(expectedTodo.tagIds, equals(mockTodos.first.tagIds));
         },
       );
     });
@@ -127,13 +129,16 @@ void main() {
         act: (bloc) => bloc.add(TodosOverviewTodoDeleted(mockTodos.first)),
         expect: () => [
           TodosOverviewState(
-            todos: mockTodos,
+            todos: [
+              mockTodos[1],
+              mockTodos[2],
+            ],
             lastDeletedTodo: mockTodos.first,
           ),
         ],
         verify: (bloc) {
           verify(() => todosRepository.deleteTodo(mockTodos.first.id)).called(1);
-          expect(bloc.state.lastDeletedTodo?.tags, equals(['work', 'urgent']));
+          expect(bloc.state.lastDeletedTodo?.tagIds, equals({'1', '2'}));
         },
       );
     });
@@ -147,7 +152,7 @@ void main() {
         expect: () => const [TodosOverviewState()],
         verify: (_) {
           verify(() => todosRepository.saveTodo(mockTodos.first)).called(1);
-          expect(mockTodos.first.tags, equals(['work', 'urgent']));
+          expect(mockTodos.first.tagIds, equals({'1', '2'}));
         },
       );
     });
@@ -232,7 +237,7 @@ void main() {
 
         for (var todo in state.filteredTodos) {
           final originalTodo = mockTodos.firstWhere((t) => t.id == todo.id);
-          expect(todo.tags, equals(originalTodo.tags));
+          expect(todo.tagIds, equals(originalTodo.tagIds));
         }
       });
 
@@ -246,7 +251,7 @@ void main() {
 
         for (var todo in state.filteredTodos) {
           final originalTodo = mockTodos.firstWhere((t) => t.id == todo.id);
-          expect(todo.tags, equals(originalTodo.tags));
+          expect(todo.tagIds, equals(originalTodo.tagIds));
         }
       });
     });
