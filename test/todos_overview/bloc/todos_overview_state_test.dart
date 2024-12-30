@@ -1,12 +1,15 @@
 // ignore_for_file: prefer_const_constructors, avoid_redundant_argument_values
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_repository/todos_repository.dart';
-// import 'package:todos_repository/todos_repository.dart';
 import '../../fakers/fake_todos.dart';
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeTodo());
+  });
   group('TodosOverviewState', () {
     TodosOverviewState createSubject({
       TodosOverviewStatus status = TodosOverviewStatus.initial,
@@ -38,10 +41,10 @@ void main() {
           lastDeletedTodo: null,
         ).props,
         equals(<Object?>[
-          TodosOverviewStatus.initial, // status
-          mockTodos, // todos
-          TodosViewFilter.all, // filter
-          null, // lastDeletedTodo
+          TodosOverviewStatus.initial,
+          mockTodos,
+          TodosViewFilter.all,
+          null,
         ]),
       );
     });

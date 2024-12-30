@@ -1,5 +1,3 @@
-// lib/todos_overview/bloc/tags_event.dart
-
 part of 'tags_bloc.dart';
 
 abstract class TagsEvent extends Equatable {
