@@ -2,38 +2,12 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:todo_app/todos_overview/bloc/tags_bloc.dart';
-import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
 
-class MockTodosRepository extends Mock implements TodosRepository {}
-
-class FakeTag extends Fake implements Tag {}
+import '../../fakers/fake_tags.dart';
+import '../../mocks/mock_repositories.dart';
 
 void main() {
-  final mockTags = [
-    Tag(
-      id: '1',
-      title: 'title 1',
-      isArchived: false,
-      color: '#FFFFFFFF',
-      todoIds: {'1'},
-    ),
-    Tag(
-      id: '2',
-      title: 'title 2',
-      isArchived: false,
-      color: '#FFFFFFFF',
-      todoIds: {'1', '3'},
-    ),
-    Tag(
-      id: '3',
-      title: 'title 3',
-      isArchived: false,
-      color: '#FFFFFFFF',
-      todoIds: {'2', '3'},
-    ),
-  ];
-
   group('TagsBloc', () {
     late TodosRepository todosRepository;
 

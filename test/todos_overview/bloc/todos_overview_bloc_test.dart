@@ -4,34 +4,11 @@ import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:todos_repository/todos_repository.dart';
 
+import '../../fakers/fake_todos.dart';
+
 class MockTodosRepository extends Mock implements TodosRepository {}
 
-class FakeTodo extends Fake implements Todo {}
-
 void main() {
-  final mockTodos = [
-    Todo(
-      id: '1',
-      title: 'title 1',
-      description: 'description 1',
-      tagIds: {'1', '2'},
-      date: DateTime.now(),
-    ),
-    Todo(
-      id: '2',
-      title: 'title 2',
-      description: 'description 2',
-      tagIds: {'3'},
-    ),
-    Todo(
-      id: '3',
-      title: 'title 3',
-      description: 'description 3',
-      isCompleted: true,
-      tagIds: {'4'},
-    ),
-  ];
-
   group('TodosOverviewBloc', () {
     late TodosRepository todosRepository;
 

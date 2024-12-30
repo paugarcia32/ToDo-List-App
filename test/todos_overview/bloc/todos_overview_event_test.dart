@@ -2,17 +2,10 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
-import 'package:todos_repository/todos_repository.dart';
+import '../../fakers/fake_todos.dart';
 
 void main() {
   group('TodosOverviewEvent', () {
-    final mockTodo = Todo(
-      id: '1',
-      title: 'title 1',
-      description: 'description 1',
-      tags: ['work', 'urgent'],
-    );
-
     group('TodosOverviewSubscriptionRequested', () {
       test('supports value equality', () {
         expect(
@@ -33,12 +26,12 @@ void main() {
       test('supports value equality', () {
         expect(
           TodosOverviewTodoCompletionToggled(
-            todo: mockTodo,
+            todo: mockTodos[1],
             isCompleted: true,
           ),
           equals(
             TodosOverviewTodoCompletionToggled(
-              todo: mockTodo,
+              todo: mockTodos[1],
               isCompleted: true,
             ),
           ),
@@ -48,11 +41,11 @@ void main() {
       test('props are correct', () {
         expect(
           TodosOverviewTodoCompletionToggled(
-            todo: mockTodo,
+            todo: mockTodos[1],
             isCompleted: true,
           ).props,
           equals(<Object?>[
-            mockTodo,
+            mockTodos[1],
             true,
           ]),
         );
@@ -62,16 +55,16 @@ void main() {
     group('TodosOverviewTodoDeleted', () {
       test('supports value equality', () {
         expect(
-          TodosOverviewTodoDeleted(mockTodo),
-          equals(TodosOverviewTodoDeleted(mockTodo)),
+          TodosOverviewTodoDeleted(mockTodos[1]),
+          equals(TodosOverviewTodoDeleted(mockTodos[1])),
         );
       });
 
       test('props are correct', () {
         expect(
-          TodosOverviewTodoDeleted(mockTodo).props,
+          TodosOverviewTodoDeleted(mockTodos[1]).props,
           equals(<Object?>[
-            mockTodo,
+            mockTodos[1],
           ]),
         );
       });

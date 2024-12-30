@@ -3,14 +3,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_repository/todos_repository.dart';
+// import 'package:todos_repository/todos_repository.dart';
+import '../../fakers/fake_todos.dart';
 
 void main() {
-  final mockTodo = Todo(
-    id: '1',
-    title: 'title 1',
-    description: 'description 1',
-  );
-  final mockTodos = [mockTodo];
   group('TodosOverviewState', () {
     TodosOverviewState createSubject({
       TodosOverviewStatus status = TodosOverviewStatus.initial,
@@ -86,14 +82,14 @@ void main() {
             status: () => TodosOverviewStatus.success,
             todos: () => [],
             filter: () => TodosViewFilter.completedOnly,
-            lastDeletedTodo: () => mockTodo,
+            lastDeletedTodo: () => mockTodos[1],
           ),
           equals(
             createSubject(
               status: TodosOverviewStatus.success,
               todos: [],
               filter: TodosViewFilter.completedOnly,
-              lastDeletedTodo: mockTodo,
+              lastDeletedTodo: mockTodos[1],
             ),
           ),
         );
@@ -102,7 +98,7 @@ void main() {
 
     test('can copyWith null lastDeletedTodo', () {
       expect(
-        createSubject(lastDeletedTodo: mockTodo).copyWith(
+        createSubject(lastDeletedTodo: mockTodos[1]).copyWith(
           lastDeletedTodo: () => null,
         ),
         equals(createSubject(lastDeletedTodo: null)),
