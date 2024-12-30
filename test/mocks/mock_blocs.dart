@@ -1,4 +1,7 @@
-import 'package:mocktail/mocktail.dart';
-import 'package:todos_repository/todos_repository.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:todo_app/todos_overview/bloc/tags_bloc.dart';
+import 'package:todo_app/todos_overview/bloc/todos_overview_bloc.dart';
 
-class MockTodosRepository extends Mock implements TodosRepository {}
+class MockTodosOverviewBloc extends MockBloc<TodosOverviewEvent, TodosOverviewState> implements TodosOverviewBloc {}
+
+class MockTagsBloc extends MockBloc<TagsEvent, TagsState> implements TagsBloc {}
