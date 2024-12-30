@@ -10,8 +10,6 @@ import 'package:todos_repository/todos_repository.dart';
 
 import '../../helpers/helpers.dart';
 
-class MockHomeCubit extends MockCubit<HomeState> implements HomeCubit {}
-
 void main() {
   late TodosRepository todosRepository;
 
