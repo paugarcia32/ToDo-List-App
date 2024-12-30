@@ -10,6 +10,7 @@ final mockTodos = [
     description: 'description 1',
     tagIds: {'1', '2'},
     date: DateTime.now(),
+    isCompleted: true,
   ),
   Todo(
     id: '2',

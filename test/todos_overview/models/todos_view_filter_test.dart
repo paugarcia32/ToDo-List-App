@@ -2,38 +2,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_repository/todos_repository.dart';
 
+import '../../fakers/fake_todos.dart';
+
 void main() {
   group('TodosViewFilter', () {
-    final completedTodo = Todo(
-      id: '0',
-      title: 'completed',
-      isCompleted: true,
-      tags: ['work', 'urgent'],
-    );
-
-    final incompleteTodo = Todo(
-      id: '1',
-      title: 'incomplete',
-      tags: ['personal'],
-    );
-
-    final anotherTodo = Todo(
-      id: '2',
-      title: 'another',
-      isCompleted: false,
-      tags: ['work'],
-    );
-
-    final allTodos = [completedTodo, incompleteTodo, anotherTodo];
-
     group('apply', () {
       test('always returns true when filter is .all', () {
         expect(
-          TodosViewFilter.all.apply(completedTodo),
+          TodosViewFilter.all.apply(mockTodos[0]),
           isTrue,
         );
         expect(
-          TodosViewFilter.all.apply(incompleteTodo),
+          TodosViewFilter.all.apply(mockTodos[1]),
           isTrue,
         );
       });
@@ -43,11 +23,11 @@ void main() {
         'and the todo is incomplete',
         () {
           expect(
-            TodosViewFilter.activeOnly.apply(completedTodo),
+            TodosViewFilter.activeOnly.apply(mockTodos[0]),
             isFalse,
           );
           expect(
-            TodosViewFilter.activeOnly.apply(incompleteTodo),
+            TodosViewFilter.activeOnly.apply(mockTodos[1]),
             isTrue,
           );
         },
@@ -58,11 +38,11 @@ void main() {
         'and the todo is completed',
         () {
           expect(
-            TodosViewFilter.completedOnly.apply(incompleteTodo),
+            TodosViewFilter.completedOnly.apply(mockTodos[1]),
             isFalse,
           );
           expect(
-            TodosViewFilter.completedOnly.apply(completedTodo),
+            TodosViewFilter.completedOnly.apply(mockTodos[0]),
             isTrue,
           );
         },
@@ -72,40 +52,40 @@ void main() {
     group('applyAll', () {
       test('correctly filters provided iterable based on selected filter', () {
         expect(
-          TodosViewFilter.all.applyAll(allTodos),
-          equals(allTodos),
+          TodosViewFilter.all.applyAll(mockTodos).toList(),
+          equals(mockTodos),
         );
         expect(
-          TodosViewFilter.activeOnly.applyAll(allTodos),
-          equals([incompleteTodo, anotherTodo]),
+          TodosViewFilter.activeOnly.applyAll(mockTodos).toList(),
+          equals([mockTodos[1]]),
         );
         expect(
-          TodosViewFilter.completedOnly.applyAll(allTodos),
-          equals([completedTodo]),
+          TodosViewFilter.completedOnly.applyAll(mockTodos).toList(),
+          equals([mockTodos[0], mockTodos[2]]),
         );
       });
     });
 
     group('filtering by tags', () {
       test('filters todos by tag', () {
-        final workTodos = allTodos.where((todo) => todo.tags?.contains('work') ?? false).toList();
-        expect(workTodos, equals([completedTodo, anotherTodo]));
+        final workTodos = mockTodos.where((todo) => todo.tagIds.contains('3')).toList();
+        expect(workTodos, equals([mockTodos[1]]));
 
-        final personalTodos = allTodos.where((todo) => todo.tags?.contains('personal') ?? false).toList();
-        expect(personalTodos, equals([incompleteTodo]));
+        final personalTodos = mockTodos.where((todo) => todo.tagIds.contains('2')).toList();
+        expect(personalTodos, equals([mockTodos[0]]));
 
-        final urgentTodos = allTodos.where((todo) => todo.tags?.contains('urgent') ?? false).toList();
-        expect(urgentTodos, equals([completedTodo]));
+        final urgentTodos = mockTodos.where((todo) => todo.tagIds.contains('1')).toList();
+        expect(urgentTodos, equals([mockTodos[0]]));
       });
 
-      test('filters todos by tag and completion status', () {
-        final activeWorkTodos =
-            allTodos.where((todo) => !todo.isCompleted && (todo.tags?.contains('work') ?? false)).toList();
-        expect(activeWorkTodos, equals([anotherTodo]));
+      group('filtering by tags', () {
+        test('filters todos by tag and completion status', () {
+          final activeWorkTodos = mockTodos.where((todo) => !todo.isCompleted && todo.tagIds.contains('3')).toList();
+          expect(activeWorkTodos, equals([mockTodos[1]]));
 
-        final completedWorkTodos =
-            allTodos.where((todo) => todo.isCompleted && (todo.tags?.contains('work') ?? false)).toList();
-        expect(completedWorkTodos, equals([completedTodo]));
+          final completedWorkTodos = mockTodos.where((todo) => todo.isCompleted && todo.tagIds.contains('3')).toList();
+          expect(completedWorkTodos, equals([]));
+        });
       });
     });
 
@@ -114,29 +94,29 @@ void main() {
         final filter = (List<Todo> todos, TodosViewFilter statusFilter, String? tag) {
           return todos.where((todo) {
             final matchesStatus = statusFilter.apply(todo);
-            final matchesTag = tag == null || (todo.tags?.contains(tag) ?? false);
+            final matchesTag = tag == null || (todo.tagIds.contains(tag));
             return matchesStatus && matchesTag;
           }).toList();
         };
 
         expect(
-          filter(allTodos, TodosViewFilter.activeOnly, 'work'),
-          equals([anotherTodo]),
+          filter(mockTodos, TodosViewFilter.activeOnly, '4'),
+          equals([]),
         );
 
         expect(
-          filter(allTodos, TodosViewFilter.completedOnly, 'work'),
-          equals([completedTodo]),
+          filter(mockTodos, TodosViewFilter.completedOnly, '4'),
+          equals([mockTodos[2]]),
         );
 
         expect(
-          filter(allTodos, TodosViewFilter.all, 'work'),
-          equals([completedTodo, anotherTodo]),
+          filter(mockTodos, TodosViewFilter.all, '4'),
+          equals([mockTodos[2]]),
         );
 
         expect(
-          filter(allTodos, TodosViewFilter.activeOnly, 'personal'),
-          equals([incompleteTodo]),
+          filter(mockTodos, TodosViewFilter.activeOnly, '3'),
+          equals([mockTodos[1]]),
         );
       });
 
@@ -144,39 +124,43 @@ void main() {
         final filter = (List<Todo> todos, TodosViewFilter statusFilter, String? tag) {
           return todos.where((todo) {
             final matchesStatus = statusFilter.apply(todo);
-            final matchesTag = tag == null || (todo.tags?.contains(tag) ?? false);
+            final matchesTag = tag == null || (todo.tagIds.contains(tag));
             return matchesStatus && matchesTag;
           }).toList();
         };
 
         expect(
-          filter(allTodos, TodosViewFilter.all, 'urgent'),
-          equals([completedTodo]),
+          filter(mockTodos, TodosViewFilter.all, '1'),
+          equals([mockTodos[0]]),
         );
 
         expect(
-          filter(allTodos, TodosViewFilter.all, 'nonexistent'),
-          isEmpty,
+          filter(mockTodos, TodosViewFilter.all, '3'),
+          equals([mockTodos[1]]),
         );
       });
 
       test('filters by status only when no tag filter', () {
-        final filter = (List<Todo> todos, TodosViewFilter statusFilter, String? tag) {
+        final filter = (
+          List<Todo> todos,
+          TodosViewFilter statusFilter,
+          String? tag,
+        ) {
           return todos.where((todo) {
             final matchesStatus = statusFilter.apply(todo);
-            final matchesTag = tag == null || (todo.tags?.contains(tag) ?? false);
+            final matchesTag = tag == null || (todo.tagIds.contains(tag));
             return matchesStatus && matchesTag;
           }).toList();
         };
 
         expect(
-          filter(allTodos, TodosViewFilter.activeOnly, null),
-          equals([incompleteTodo, anotherTodo]),
+          filter(mockTodos, TodosViewFilter.activeOnly, null),
+          equals([mockTodos[1]]),
         );
 
         expect(
-          filter(allTodos, TodosViewFilter.completedOnly, null),
-          equals([completedTodo]),
+          filter(mockTodos, TodosViewFilter.completedOnly, null),
+          equals([mockTodos[0], mockTodos[2]]),
         );
       });
     });
