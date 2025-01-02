@@ -1,28 +1,27 @@
-// ignore_for_file: prefer_const_constructors, avoid_redundant_argument_values
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:todo_app/edit_todo/edit_todo.dart';
-import 'package:todos_repository/todos_repository.dart';
+import 'package:todos_api/todos_api.dart';
+
+import '../../fakers/fake_tags.dart';
+import '../../fakers/fake_todos.dart';
 
 void main() {
   group('EditTodoState', () {
-    final mockInitialTodo = Todo(
-      id: '1',
-      title: 'title 1',
-      description: 'description 1',
-    );
-
     EditTodoState createSubject({
       EditTodoStatus status = EditTodoStatus.initial,
       Todo? initialTodo,
       String title = '',
       String description = '',
+      Set<Tag> selectedTags = const {},
+      DateTime? date,
     }) {
       return EditTodoState(
         status: status,
         initialTodo: initialTodo,
         title: title,
         description: description,
+        selectedTags: selectedTags,
+        date: date,
       );
     }
 
@@ -34,18 +33,27 @@ void main() {
     });
 
     test('props are correct', () {
+      // Fijamos la fecha en una variable para poder compararla exactamente.
+      final fixedDate = DateTime(2025, 1, 2);
+
+      // Usamos mockTodos[0] en createSubject y esperamos lo mismo en equals
       expect(
         createSubject(
           status: EditTodoStatus.initial,
-          initialTodo: mockInitialTodo,
-          title: 'title',
-          description: 'description',
+          initialTodo: mockTodos[0],
+          title: 'title 1',
+          description: 'description 1',
+          // Dos tags simulados:
+          selectedTags: {mockTags[0], mockTags[1]},
+          date: fixedDate,
         ).props,
         equals(<Object?>[
-          EditTodoStatus.initial, // status
-          mockInitialTodo, // initialTodo
-          'title', // title
-          'description', // description
+          EditTodoStatus.initial,
+          mockTodos[0], // Ojo: mismo Todo que en createSubject
+          'title 1',
+          'description 1',
+          {mockTags[0], mockTags[1]}, // Se compara el Set exactamente
+          fixedDate, // Misma instancia de la fecha
         ]),
       );
     });
@@ -80,19 +88,27 @@ void main() {
       });
 
       test('replaces every non-null parameter', () {
+        final fixedDate = DateTime(2025, 1, 2);
+
+        final newTags = {mockTags[0], mockTags[1]};
+
         expect(
           createSubject().copyWith(
             status: EditTodoStatus.success,
-            initialTodo: mockInitialTodo,
+            initialTodo: mockTodos[0],
             title: 'title',
             description: 'description',
+            selectedTags: newTags,
+            date: fixedDate,
           ),
           equals(
             createSubject(
               status: EditTodoStatus.success,
-              initialTodo: mockInitialTodo,
+              initialTodo: mockTodos[0],
               title: 'title',
               description: 'description',
+              selectedTags: newTags,
+              date: fixedDate,
             ),
           ),
         );
