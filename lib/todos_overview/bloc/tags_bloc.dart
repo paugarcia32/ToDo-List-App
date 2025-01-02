@@ -2,6 +2,7 @@
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:todo_app/logging/logger.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
 
@@ -28,18 +29,21 @@ class TagsBloc extends Bloc<TagsEvent, TagsState> {
         _todosRepository.getTags(),
         onData: (tags) {
           final tagIdToTitleMap = {for (var tag in tags) tag.id: tag.title};
-
           return state.copyWith(
             status: TagsStatus.success,
             tags: tags,
             tagIdToTitleMap: tagIdToTitleMap,
           );
         },
-        onError: (_, __) => state.copyWith(
-          status: TagsStatus.failure,
-        ),
+        onError: (e, st) {
+          Logger.log.e(e, stackTrace: st);
+          return state.copyWith(
+            status: TagsStatus.failure,
+          );
+        },
       );
-    } catch (_) {
+    } catch (e) {
+      Logger.log.e(e);
       emit(state.copyWith(
         status: TagsStatus.failure,
       ));

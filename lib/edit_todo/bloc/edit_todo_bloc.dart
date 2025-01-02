@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:todo_app/logging/logger.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
 
@@ -27,7 +28,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     on<EditTodoSubmitted>(_onSubmitted);
     on<EditTodoDateChanged>(_onDateChanged);
 
-    add(const EditTodoLoadTags());
+    // add(const EditTodoLoadTags());
   }
 
   final TodosRepository _todosRepository;
@@ -36,6 +37,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     EditTodoTitleChanged event,
     Emitter<EditTodoState> emit,
   ) {
+    Logger.log.i('Todo Title Changed to: ${event.title}');
     emit(state.copyWith(title: event.title));
   }
 
@@ -43,6 +45,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     EditTodoDescriptionChanged event,
     Emitter<EditTodoState> emit,
   ) {
+    Logger.log.i('Todo Description Changed to: ${event.description}');
     emit(state.copyWith(description: event.description));
   }
 
@@ -50,6 +53,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     EditTodoDateChanged event,
     Emitter<EditTodoState> emit,
   ) {
+    Logger.log.i('Todo Date Changed to: ${event.date}');
     emit(state.copyWith(date: event.date));
   }
 
@@ -63,6 +67,7 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     } else {
       updatedTags.add(event.tag);
     }
+    Logger.log.i('Todo Tag Changed to: ${updatedTags}');
     emit(state.copyWith(selectedTags: updatedTags));
   }
 
@@ -84,15 +89,13 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
 
       final selectedTags = allTags.where((tag) => tagIds.contains(tag.id)).toSet();
 
-      print('Tags seleccionados: ${selectedTags.map((tag) => tag.title).toList()}');
+      Logger.log.d('Selected Tags: ${selectedTags.map((tag) => tag.title).toList()}');
 
       emit(state.copyWith(selectedTags: selectedTags));
-      print('tagIds en el Todo inicial: ${state.initialTodo!.tagIds}');
+      Logger.log.d('tagIds on the initial Todo: ${state.initialTodo!.tagIds}');
     } else {
-      print('No hay Todo inicial o no tiene tags.');
+      Logger.log.i('There is no initial Todo or does not have tags.');
     }
-
-    print('tagIds en el Todo inicial: ${state.initialTodo?.tagIds}');
   }
 
   Future<void> _onSubmitted(
@@ -110,10 +113,11 @@ class EditTodoBloc extends Bloc<EditTodoEvent, EditTodoState> {
     try {
       await _todosRepository.saveTodo(todo);
       emit(state.copyWith(status: EditTodoStatus.success));
-      print('Tags en el todo guardado: ${todo.tagIds}');
+      Logger.log.i('Tags en el todo guardado: ${todo.tagIds}');
       await Future.delayed(const Duration(milliseconds: 500));
       emit(state.copyWith(status: EditTodoStatus.initial));
     } catch (e) {
+      Logger.log.e(e);
       emit(state.copyWith(status: EditTodoStatus.failure));
       await Future.delayed(const Duration(milliseconds: 500));
       emit(state.copyWith(status: EditTodoStatus.initial));

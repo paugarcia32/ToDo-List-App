@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:todo_app/logging/logger.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
 
@@ -42,7 +44,10 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
         status: ExploreStatus.success,
         tags: tagsList.toSet(),
       ),
-      onError: (_, __) => state.copyWith(status: ExploreStatus.failure),
+      onError: (e, st) {
+        Logger.log.e(e, stackTrace: st);
+        return state.copyWith(status: ExploreStatus.failure);
+      },
     );
   }
 
@@ -52,7 +57,9 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   ) async {
     try {
       await _todosRepository.deleteTag(event.tagId);
-    } catch (e) {
+      Logger.log.i('Tag with ID: ${event.tagId} has been deleted');
+    } catch (e, st) {
+      Logger.log.e(e, stackTrace: st);
       emit(state.copyWith(status: ExploreStatus.failure));
     }
   }
@@ -63,7 +70,9 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   ) async {
     try {
       await _todosRepository.saveTag(event.addedTag);
-    } catch (e) {
+      Logger.log.i('Tag with ID: ${event.addedTag.id} and title: "${event.addedTag.title}" has been created');
+    } catch (e, st) {
+      Logger.log.e(e, stackTrace: st);
       emit(state.copyWith(status: ExploreStatus.failure));
     }
   }
@@ -72,7 +81,8 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
     TagEdited event,
     Emitter<ExploreState> emit,
   ) async {
-    try {} catch (e) {
+    try {} catch (e, st) {
+      Logger.log.e(e, stackTrace: st);
       emit(state.copyWith(status: ExploreStatus.failure));
     }
   }
@@ -111,7 +121,8 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
         color: "#FFFFFFFF",
         initialTag: null,
       ));
-    } catch (e) {
+    } catch (e, st) {
+      Logger.log.e(e, stackTrace: st);
       emit(state.copyWith(status: ExploreStatus.failure));
     }
   }

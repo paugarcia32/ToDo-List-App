@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:todo_app/logging/logger.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
@@ -41,7 +42,8 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
           status: () => TodosOverviewStatus.failure,
         ),
       );
-    } catch (_) {
+    } catch (e) {
+      Logger.log.e(e);
       emit(state.copyWith(
         status: () => TodosOverviewStatus.failure,
       ));
@@ -52,6 +54,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     TodosOverviewTodoCompletionToggled event,
     Emitter<TodosOverviewState> emit,
   ) async {
+    Logger.log.i('Todo completed toggled: ${event.todo.tagIds} - ${event.todo.title} : ${event.isCompleted}');
     final newTodo = event.todo.copyWith(isCompleted: event.isCompleted);
     await _todosRepository.saveTodo(newTodo);
   }
@@ -66,8 +69,8 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
       todos: () => updatedTodos,
       lastDeletedTodo: () => event.todo,
     ));
-
     await _todosRepository.deleteTodo(event.todo.id);
+    Logger.log.i('Todo "${event.todo.title}" with ID: ${event.todo.tagIds} successfully deleted');
   }
 
   Future<void> _onUndoDeletionRequested(
@@ -89,6 +92,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     Emitter<TodosOverviewState> emit,
   ) {
     emit(state.copyWith(filter: () => event.filter));
+    Logger.log.i('Filter changed to: ${event.filter}');
   }
 
   Future<void> _onToggleAllRequested(
@@ -97,6 +101,7 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
   ) async {
     final areAllCompleted = state.todos.every((todo) => todo.isCompleted);
     await _todosRepository.completeAll(isCompleted: !areAllCompleted);
+    Logger.log.i('Toggled all Todos');
   }
 
   Future<void> _onClearCompletedRequested(
@@ -104,5 +109,6 @@ class TodosOverviewBloc extends Bloc<TodosOverviewEvent, TodosOverviewState> {
     Emitter<TodosOverviewState> emit,
   ) async {
     await _todosRepository.clearCompleted();
+    Logger.log.i('Cleared all completed Todos');
   }
 }
