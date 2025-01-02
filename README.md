@@ -10,8 +10,6 @@
 ![GitHub issues](https://img.shields.io/github/issues/paugarcia32/ToDo-List-App)
 ![GitHub forks](https://img.shields.io/github/forks/paugarcia32/ToDo-List-App)
 ![GitHub PRs](https://img.shields.io/github/issues-pr/paugarcia32/ToDo-List-App)
-![SQLite Badge](https://img.shields.io/badge/SQLite-%2307405e.svg?logo=sqlite&logoColor=white&style=flat)
-
 ![Coverage](https://raw.githubusercontent.com/paugarcia32/ToDo-List-App/master/coverage_badge.svg?sanitize=true)
 
 </div>
