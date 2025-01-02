@@ -30,6 +30,10 @@ dev_dependencies:
     sdk: flutter
   mockingjay: ^0.6.0
   mocktail: ^1.0.0
+  flutter_coverage_badge:
+    git:
+      url: https://github.com/amondnet/flutter_coverage_badge.git
+      ref: master
 
 flutter:
   uses-material-design: true

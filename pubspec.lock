@@ -171,6 +171,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.1.6"
+  flutter_coverage_badge:
+    dependency: "direct dev"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: a683eac547353a89455e4b68c6322e3a24c074c1
+      url: "https://github.com/amondnet/flutter_coverage_badge.git"
+    source: git
+    version: "0.0.1+1"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
@@ -258,6 +267,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.9.0"
+  lcov:
+    dependency: transitive
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "532be83f31b49fcad66884dee38ae1affe7c4319"
+      url: "git@github.com:amondnet/lcov.dart.git"
+    source: git
+    version: "6.0.0"
   leak_tracker:
     dependency: transitive
     description:
