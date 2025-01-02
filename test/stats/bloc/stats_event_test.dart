@@ -1,21 +1,35 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:todo_app/stats/stats.dart';
 
 void main() {
   group('StatsEvent', () {
-    group('StatsSubscriptionRequested', () {
+    group('TodosSubscriptionRequested', () {
       test('supports value equality', () {
         expect(
-          StatsSubscriptionRequested(),
-          equals(StatsSubscriptionRequested()),
+          TodosSubscriptionRequested(),
+          equals(TodosSubscriptionRequested()),
         );
       });
 
       test('props are correct', () {
         expect(
-          StatsSubscriptionRequested().props,
+          TodosSubscriptionRequested().props,
+          equals(<Object?>[]),
+        );
+      });
+    });
+
+    group('TagsSubscriptionRequested', () {
+      test('supports value equality', () {
+        expect(
+          TagsSubscriptionRequested(),
+          equals(TagsSubscriptionRequested()),
+        );
+      });
+
+      test('props are correct', () {
+        expect(
+          TagsSubscriptionRequested().props,
           equals(<Object?>[]),
         );
       });

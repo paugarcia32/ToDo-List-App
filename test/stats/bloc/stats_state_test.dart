@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, avoid_redundant_argument_values
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:todo_app/stats/stats.dart';
 
@@ -9,11 +7,13 @@ void main() {
       StatsStatus status = StatsStatus.initial,
       int completedTodos = 0,
       int activeTodos = 0,
+      int totalTags = 0,
     }) {
       return StatsState(
         status: status,
         completedTodos: completedTodos,
         activeTodos: activeTodos,
+        totalTags: totalTags,
       );
     }
 
@@ -30,17 +30,19 @@ void main() {
           status: StatsStatus.initial,
           completedTodos: 1,
           activeTodos: 2,
+          totalTags: 3,
         ).props,
         equals(<Object?>[
-          StatsStatus.initial, // status
-          1, // completedTodos
-          2, // activeTodos
+          StatsStatus.initial,
+          1,
+          2,
+          3,
         ]),
       );
     });
 
     group('copyWith', () {
-      test('returns the same object if not arguments are provided', () {
+      test('returns the same object if no arguments are provided', () {
         expect(
           createSubject().copyWith(),
           equals(createSubject()),
@@ -53,6 +55,7 @@ void main() {
             status: null,
             completedTodos: null,
             activeTodos: null,
+            totalTags: null,
           ),
           equals(createSubject()),
         );
@@ -64,12 +67,14 @@ void main() {
             status: StatsStatus.success,
             completedTodos: 1,
             activeTodos: 2,
+            totalTags: 4,
           ),
           equals(
             createSubject(
               status: StatsStatus.success,
               completedTodos: 1,
               activeTodos: 2,
+              totalTags: 4,
             ),
           ),
         );
