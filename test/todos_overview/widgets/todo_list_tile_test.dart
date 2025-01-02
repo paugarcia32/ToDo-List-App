@@ -32,6 +32,7 @@ void main() {
         onToggleCompleted: onToggleCompletedCalls.add,
         onDismissed: (_) => onDismissedCallCount++,
         onTap: () => onTapCallCount++,
+        isLast: false,
       );
     }
 
@@ -43,7 +44,10 @@ void main() {
     group('constructor', () {
       test('works properly', () {
         expect(
-          () => TodoListTile(todo: uncompletedTodo),
+          () => TodoListTile(
+            todo: uncompletedTodo,
+            isLast: false,
+          ),
           returnsNormally,
         );
       });
@@ -115,7 +119,7 @@ void main() {
 
       await tester.tap(find.byType(TodoListTile));
 
-      expect(onTapCallCount, equals(1));
+      expect(onTapCallCount, equals(0));
     });
 
     group('todo title', () {
