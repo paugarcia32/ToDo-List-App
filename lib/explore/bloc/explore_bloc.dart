@@ -79,7 +79,15 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
     TagEdited event,
     Emitter<ExploreState> emit,
   ) async {
-    try {} catch (e, st) {
+    try {
+      await _todosRepository.saveTag(event.deletedTag);
+
+      emit(state.copyWith(status: ExploreStatus.success));
+
+      Logger.log.i(
+        'Tag with ID: ${event.deletedTag.id} and title: "${event.deletedTag.title}" has been edited',
+      );
+    } catch (e, st) {
       Logger.log.e(e, stackTrace: st);
       emit(state.copyWith(status: ExploreStatus.failure));
     }
