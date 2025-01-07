@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/edit_todo/edit_todo.dart';
-import 'package:todo_app/l10n/l10n.dart';
+import 'package:todo_app/utils/l10n/l10n.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';
 import 'package:collection/collection.dart';

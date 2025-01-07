@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:todo_app/app/app.dart';
 import 'package:todo_app/home/home.dart';
-import 'package:todo_app/theme/theme.dart';
+import 'package:todo_app/utils/theme/theme.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:todos_repository/todos_repository.dart';
 

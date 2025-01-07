@@ -1,7 +1,7 @@
 // import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:todo_app/logging/logger.dart';
+import 'package:todo_app/utils/logging/logger.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();

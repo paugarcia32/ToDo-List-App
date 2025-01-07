@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:todo_app/logging/logger.dart';
+import 'package:todo_app/utils/logging/logger.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:todos_repository/todos_repository.dart';

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/explore/bloc/explore_bloc.dart';
 import 'package:todo_app/explore/widgets/addTagModal.dart';
 import 'package:todo_app/explore/widgets/tag_list_tile.dart';
-import 'package:todo_app/l10n/l10n.dart';
+import 'package:todo_app/utils/l10n/l10n.dart';
 import 'package:todos_repository/todos_repository.dart';
 
 class ExplorePage extends StatelessWidget {
