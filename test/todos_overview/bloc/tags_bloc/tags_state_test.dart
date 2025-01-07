@@ -3,10 +3,10 @@
 // ignore_for_file: prefer_const_constructors, avoid_redundant_argument_values
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:todo_app/todos_overview/bloc/tags_bloc.dart';
+import 'package:todo_app/todos_overview/bloc/tags_bloc/tags_bloc.dart';
 import 'package:todos_api/todos_api.dart';
 import 'package:mocktail/mocktail.dart';
-import '../../fakers/fake_tags.dart';
+import '../../../fakers/fake_tags.dart';
 
 void main() {
   setUpAll(() {

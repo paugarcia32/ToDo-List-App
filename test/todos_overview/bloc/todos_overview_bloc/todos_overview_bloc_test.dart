@@ -4,7 +4,7 @@ import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:todos_repository/todos_repository.dart';
 
-import '../../fakers/fake_todos.dart';
+import '../../../fakers/fake_todos.dart';
 
 class MockTodosRepository extends Mock implements TodosRepository {}
 

@@ -1,11 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:todo_app/todos_overview/bloc/tags_bloc.dart';
+import 'package:todo_app/todos_overview/bloc/tags_bloc/tags_bloc.dart';
 import 'package:todos_repository/todos_repository.dart';
 
-import '../../fakers/fake_tags.dart';
-import '../../mocks/mock_repositories.dart';
+import '../../../fakers/fake_tags.dart';
+import '../../../mocks/mock_repositories.dart';
 
 void main() {
   group('TagsBloc', () {

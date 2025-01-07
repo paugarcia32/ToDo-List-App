@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo_app/todos_overview/bloc/tags_bloc.dart';
+import 'package:todo_app/todos_overview/bloc/tags_bloc/tags_bloc.dart';
 import 'package:todos_api/todos_api.dart';
 
 class TodoCard extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:todo_app/todos_overview/bloc/tags_bloc.dart';
+import 'package:todo_app/todos_overview/bloc/tags_bloc/tags_bloc.dart';
 
 void main() {
   group('TagsEvent', () {

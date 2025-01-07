@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/edit_todo/bloc/edit_todo_bloc.dart';
 import 'package:todo_app/edit_todo/view/edit_todo_page.dart';
 import 'package:todo_app/l10n/l10n.dart';
-import 'package:todo_app/todos_overview/bloc/tags_bloc.dart';
 import 'package:todo_app/todos_overview/todos_overview.dart';
 import 'package:todos_repository/todos_repository.dart';
 
