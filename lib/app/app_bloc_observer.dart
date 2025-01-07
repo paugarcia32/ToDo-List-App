@@ -34,7 +34,7 @@ class AppBlocObserver extends BlocObserver {
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
-    Logger.log.t(transition);
+    Logger.log.i('BLoC: $bloc | Transition: $transition');
   }
 
   @override

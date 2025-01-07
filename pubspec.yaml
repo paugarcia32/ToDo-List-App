@@ -19,6 +19,7 @@ dependencies:
   local_storage_todos_api:
     path: packages/local_storage_todos_api
   logger: ^2.5.0
+  talker_bloc_logger: ^4.6.0
   todos_api:
     path: packages/todos_api
   todos_repository:

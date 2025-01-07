@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_app/explore/bloc/explore_bloc.dart';
-import 'package:todo_app/utils/l10n/l10n.dart';
+import 'package:todo_app/l10n/l10n.dart';
 import 'package:todo_app/utils/theme/theme.dart';
 
 class AddTagModal extends StatefulWidget {
